@@ -2,7 +2,9 @@
   <div>
     Hellow orld
     {{ user }}
-    <button @click="userLogout">Logout</button>
+    <button @click="userLogout">
+      Logout
+    </button>
   </div>
 </template>
 
