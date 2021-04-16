@@ -21,10 +21,15 @@
               class="border rounded-lg px-3 py-2 mt-1 text-sm w-full focus:ring-2
               focus:ring-blue-600 focus:outline-none"
               placeholder="user@atmakoreanbbq.com"
-              :class="{ 'ring-2 ring-red-600' : $v.login.email.$dirty && !$v.login.email.required }"
+              :class="{ 'ring-2 ring-red-600' : sumbitted && $v.login.email.$error }"
+              @blur="$v.login.email.$touch()"
+              @focus="$v.login.email.$touch()"
             >
-            <span v-if="$v.login.email.$dirty && !$v.login.email.required" class="text-xs text-red-500">
+            <span v-if="sumbitted && !$v.login.email.required" class="text-xs text-red-500">
               Email tidak boleh kosong
+            </span>
+            <span v-if="sumbitted && !$v.login.email.email" class="text-xs text-red-500">
+              Email tidak valid
             </span>
           </div>
           <div class="mb-3">
@@ -37,10 +42,18 @@
               class="border rounded-lg px-3 py-2 mt-1 text-sm w-full focus:ring-2
               focus:ring-blue-600 focus:outline-none"
               placeholder="Masukkan password"
-              :class="{ 'ring-2 ring-red-600' : $v.login.password.$dirty && !$v.login.password.required }"
+              :class="{ 'ring-2 ring-red-600' : sumbitted && $v.login.password.$error }"
+              @blur="$v.login.password.$touch()"
+              @focus="$v.login.password.$touch()"
             >
-            <span v-if="$v.login.password.$dirty && !$v.login.password.required" class="text-xs text-red-500">
+            <span v-if="sumbitted && !$v.login.password.required" class="text-xs text-red-500">
               Password tidak boleh kosong
+            </span>
+            <span v-if="sumbitted && !$v.login.password.minLength" class="text-xs text-red-500">
+              Password minimal terdiri dari 8 karakter
+            </span>
+            <span v-if="sumbitted && !$v.login.password.maxLength" class="text-xs text-red-500">
+              Password maksimal terdiri dari 72 karakter
             </span>
           </div>
           <div class="flex justify-between mb-4">
@@ -60,8 +73,8 @@
             </a>
           </div>
           <button
-            class="hover:bg-red-600 focus:bg-red-700 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
-            :class="[ loading ? 'bg-red-100' : 'bg-red-500 focus:shadow-sm focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 focus:outline-none' ]"
+            class="text-white w-full py-2.5 rounded-lg text-sm shadow-sm font-semibold text-center inline-block"
+            :class="[ loading ? 'bg-red-100' : 'hover:shadow-md bg-red-500 hover:bg-red-600 focus:bg-red-700  focus:shadow-sm focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 focus:outline-none' ]"
             type="submit"
             :disabled="loading"
           >
@@ -100,8 +113,8 @@ export default {
   data () {
     return {
       login: {
-        email: 'owner@atmakoreanbbq.com',
-        password: 'password'
+        email: '',
+        password: ''
       },
       errors: {
         login: {
@@ -110,11 +123,13 @@ export default {
         }
       },
       loading: false,
-      rememberMe: false
+      rememberMe: false,
+      sumbitted: false
     }
   },
   methods: {
     userLogin () {
+      this.sumbitted = true
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.loading = true
@@ -123,9 +138,8 @@ export default {
         }).then(() => {
           this.$router.push('/')
         }).catch((err) => {
-          alert(err)
-        }).finally(() => {
           this.loading = false
+          alert(err)
         })
       }
     }
