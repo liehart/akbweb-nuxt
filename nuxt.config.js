@@ -1,7 +1,7 @@
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'akbweb-nuxt',
+    title: 'Atma Korean BBQ',
     htmlAttrs: {
       lang: 'en'
     },

@@ -103,6 +103,7 @@
 import { email, maxLength, minLength, required } from 'vuelidate/lib/validators'
 
 export default {
+  auth: 'guest',
   name: 'Login',
   validations: {
     login: {

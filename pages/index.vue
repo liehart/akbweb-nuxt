@@ -12,7 +12,7 @@
 export default {
   data () {
     return {
-      user: this.$auth.$storage.getUniversal('user')
+      user: this.$auth.user
     }
   },
   methods: {
