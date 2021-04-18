@@ -47,7 +47,7 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'http://localhost/api'
+    baseURL: 'https://api.atmakoreanbbq.com/api'
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
