@@ -27,7 +27,7 @@ export default {
         }
       },
       plugins: [
-        require('@tailwindcss/forms'),
+        require('@tailwindcss/forms')
       ]
     }
   },
@@ -122,7 +122,7 @@ export default {
             url: 'auth/logout',
             method: 'post'
           }
-        },
+        }
       }
     }
   }

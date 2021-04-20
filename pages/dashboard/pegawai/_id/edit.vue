@@ -260,16 +260,6 @@ export default {
       }
     }
   },
-  // mounted () {
-  //   this.form = this.$store.state.employee.employee
-  //   console.log(this.form)
-  // },
-  async fetch () {
-    await this.$axios.get('employee/' + this.$route.params.id).then((res) => {
-      this.form = res.data.data
-      this.title = res.data.data.name
-    })
-  },
   data () {
     return {
       title: '',
@@ -299,6 +289,16 @@ export default {
         }
       ]
     }
+  },
+  // mounted () {
+  //   this.form = this.$store.state.employee.employee
+  //   console.log(this.form)
+  // },
+  async fetch () {
+    await this.$axios.get('employee/' + this.$route.params.id).then((res) => {
+      this.form = res.data.data
+      this.title = res.data.data.name
+    })
   },
   head () {
     return {
