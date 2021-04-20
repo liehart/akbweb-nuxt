@@ -19,10 +19,26 @@ export default {
   css: [
   ],
 
+  tailwindcss: {
+    config: {
+      theme: {
+        fontFamily: {
+          body: ['Open Sans']
+        }
+      },
+      plugins: [
+        require('@tailwindcss/forms'),
+      ]
+    }
+  },
+
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     {
       src: '~/plugins/vuelidate.js'
+    },
+    {
+      src: '~/plugins/directives.js'
     }
   ],
 
@@ -35,8 +51,31 @@ export default {
     '@nuxtjs/eslint-module',
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/tailwindcss
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/fontawesome'
   ],
+
+  fontawesome: {
+    icons: {
+      solid: [
+        'faUserTag',
+        'faUser',
+        'faHome',
+        'faChair',
+        'faUtensils',
+        'faTruckLoading',
+        'faUsers',
+        'faPrint',
+        'faList',
+        'faBookmark',
+        'faMoneyCheckAlt',
+        'faCog',
+        'faTrash',
+        'faPencilAlt',
+        'faPowerOff'
+      ]
+    }
+  },
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
@@ -47,7 +86,7 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'https://api.atmakoreanbbq.com/api'
+    baseURL: 'http://localhost/api'
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

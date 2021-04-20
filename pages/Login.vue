@@ -14,10 +14,10 @@
           <div class="mb-3">
             <label class="font-semibold text-sm text-gray-600 pb-1 block">E-mail</label>
             <input
+              ref="email"
               v-model="login.email"
               type="text"
               name="email"
-              ref="email"
               class="border rounded-lg px-3 py-2 mt-1 text-sm w-full focus:ring-2
               focus:ring-blue-600 focus:outline-none"
               placeholder="user@atmakoreanbbq.com"
@@ -35,10 +35,10 @@
           <div class="mb-3">
             <label class="font-semibold text-sm text-gray-600 pb-1 block">Password</label>
             <input
+              ref="password"
               v-model="login.password"
               type="password"
               name="password"
-              ref="password"
               class="border rounded-lg px-3 py-2 mt-1 text-sm w-full focus:ring-2
               focus:ring-blue-600 focus:outline-none"
               placeholder="Masukkan password"
