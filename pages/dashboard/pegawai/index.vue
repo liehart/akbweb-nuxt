@@ -9,11 +9,13 @@
     <div class="mb-5 flex">
       <input
         ref="search"
+        v-model="search"
         type="text"
         name="search"
         class="border rounded-lg px-3 py-2 text-sm w-full focus:ring-2
               focus:ring-blue-600 focus:outline-none"
         placeholder="Cari Pegawai"
+        @input="isTyping = true"
       >
       <NuxtLink
         to="/dashboard/pegawai/create"
@@ -24,9 +26,18 @@
         Tambah Pegawai
       </NuxtLink>
     </div>
-    <div class="shadow overflow-hidden border-b bg-white border-gray-200 sm:rounded-lg">
+    <div
+      class="shadow overflow-hidden border-b bg-white border-gray-200 sm:rounded-lg">
+      <div
+        class="h-1"
+        :class="[ loadingAPI ? 'bg-red-200' : 'bg-gray-50' ]"
+      >
+        <div v-if="loadingAPI">
+          <div class="loading-bar h-1 bg-red-500"></div>
+        </div>
+      </div>
       <table class="table-fixed min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+        <thead v-if="!loading && employees.data.length > 0" class="bg-gray-50">
           <tr>
             <th scope="col" class="w-1/2 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Nama
@@ -171,18 +182,25 @@
     </div>
   </div>
 </template>
+
 <script>
+import _ from 'lodash'
+
 export default {
   data () {
     return {
+      isTyping: false,
+      search: '',
       loading: true,
+      loadingAPI: true,
       employees: []
     }
   },
   async fetch () {
     await this.$axios.$get('employee').then((res) => {
-      this.employees = res.data
       this.loading = false
+      this.loadingAPI = false
+      this.employees = res.data
     })
   },
   head () {
@@ -190,15 +208,80 @@ export default {
       title: 'Data Pegawai'
     }
   },
+  watch: {
+    search: _.debounce(function () {
+      this.isTyping = false
+    }, 500),
+    isTyping (state) {
+      if (!state) {
+        this.searchAPI()
+      }
+    }
+  },
   methods: {
     showDetail (data) {
       this.$router.push('/dashboard/pegawai/' + data.id)
     },
     async getPage (link) {
-      await this.$axios.$get(link).then((res) => {
+      this.loadingAPI = true
+      let url = 'employee' + link
+      if (this.search !== '') {
+        url = 'search/employee?query=' + this.search + '&' + link.substring(1)
+      }
+      await this.$axios.$get(url).then((res) => {
+        this.loadingAPI = false
+        this.employees = res.data
+      })
+    },
+    async searchAPI () {
+      this.loadingAPI = true
+      await this.$axios.$get('search/employee?query=' + this.search).then((res) => {
+        this.loadingAPI = false
         this.employees = res.data
       })
     }
   }
 }
 </script>
+
+<style scoped>
+.loading-bar {
+  animation: indeterminate 2800ms infinite linear
+}
+@keyframes indeterminate {
+  0% {
+    transform: translateX(-100%) scaleX(0.2) }
+
+  20% {
+    transform: translateX(-40%) scaleX(0.2) }
+
+  30% {
+    transform: translateX(0%) scaleX(0.5) }
+
+  55% {
+    transform: translateX(100%) scaleX(0.7) }
+
+  55.99% {
+    transform: scaleX(0) }
+
+  56% {
+    transform: translateX(-100%) scaleX(0) }
+
+  56.99% {
+    transform: translateX(-100%) scaleX(0.6) }
+
+  75% {
+    transform: translateX(-5%) scaleX(0.6) }
+
+  85% {
+    transform: translateX(30%) scaleX(0.3) }
+
+  98% {
+    transform: translateX(100%) scaleX(0.2)}
+
+  99.99% {
+    transform: scaleX(0) }
+  100% {
+    transform: translateX(-100%)}
+}
+</style>

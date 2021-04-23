@@ -290,10 +290,6 @@ export default {
       ]
     }
   },
-  // mounted () {
-  //   this.form = this.$store.state.employee.employee
-  //   console.log(this.form)
-  // },
   async fetch () {
     await this.$axios.get('employee/' + this.$route.params.id).then((res) => {
       this.form = res.data.data
@@ -311,10 +307,27 @@ export default {
     },
     createEmployeeAPI () {
       this.$axios.put('employee/' + this.form.id, this.form).then((res) => {
-        console.log(res)
         this.back()
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data pegawai ' + this.form.name + ' berhasil diedit.',
+          timeout: 3
+        })
       }).catch((err) => {
-        console.log(err)
+        if (err.response) {
+          if (err.response.data.message === 'V_ERR') {
+            const errors = err.response.data.data
+            for (const key in errors) {
+              this.$toast.show({
+                type: 'danger',
+                title: 'Error',
+                message: errors[key][0],
+                timeout: 3
+              })
+            }
+          }
+        }
       })
     },
     createEmployee () {

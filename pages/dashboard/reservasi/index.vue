@@ -2,30 +2,28 @@
   <div>
     <div class="mb-5">
       <h1 class="text-4xl font-bold">
-        Data Pelanggan
+        Data Reservasi
       </h1>
-      <p>Selamat datang di menu pengelolaan data pelanggan</p>
+      <p>Selamat datang di menu pengelolaan data reservasi</p>
     </div>
     <div class="mb-5 flex">
       <div class="flex w-full relative">
         <input
           ref="search"
-          v-model="search"
           type="text"
           name="search"
           class="w-full border rounded-lg px-3 py-2 text-sm w-full focus:ring-2
               focus:ring-blue-600 focus:outline-none"
-          placeholder="Cari Pelanggan"
-          @input="isTyping = true"
+          placeholder="Cari Reservasi"
         >
       </div>
       <NuxtLink
-        to="/dashboard/pelanggan/create"
+        to="/dashboard/reservasi/create"
         class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
             focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap"
       >
-        Tambah Pelanggan
+        Tambah Reservasi
       </NuxtLink>
     </div>
     <div
@@ -42,14 +40,17 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="w-1/3 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nama
+            <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Tanggal
             </th>
-            <th scope="col" class="w-1/3 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Email
+            <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Sesi
             </th>
-            <th scope="col" class="w-1/5 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nomor Telepon
+            <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Nomor Meja
+            </th>
+            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Nama Pelanggan
             </th>
             <th scope="col" class="relative px-4 py-3">
               <span class="sr-only">Edit</span>
@@ -63,37 +64,45 @@
             </td>
           </tr>
         </tbody>
-        <tbody v-else-if="!loading && customers.data.length > 0" class="bg-white divide-y divide-gray-200">
-          <tr v-for="customer in customers.data" :key="customer.id">
+        <tbody v-else-if="!loading && reservations.data.length > 0" class="bg-white divide-y divide-gray-200">
+          <tr v-for="reservation in reservations.data" :key="reservation.id">
             <td class="px-4 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-500">
-                {{ customer.name }}
+                {{ reservation.reservation_date }}
               </div>
             </td>
             <td class="px-4 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-500">
-                <span v-if="customer.email !== null">
-                  {{ customer.email }}
+                <span v-if="reservation.reservation_session === 'lunch'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                  Makan Siang
                 </span>
-                <span v-else>
-                  -
+                <span v-else-if="reservation.reservation_session === 'dinner'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                  Makan Malam
+                </span>
+                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                  Tanpa Reservasi
                 </span>
               </div>
             </td>
             <td class="px-4 py-4">
               <div class="text-sm text-gray-500">
-                <span v-if="customer.phone !== null">
-                  {{ customer.phone }}
+                {{ reservation.table_table_number }}
+              </div>
+            </td>
+            <td class="px-4 py-4">
+              <div class="text-sm text-gray-500">
+                <span v-if="!reservation.customer.deleted_at">
+                  {{ reservation.customer.name }}
                 </span>
-                <span v-else>
-                  -
+                <span v-else class="italic text-gray-300">
+                  {{ reservation.customer.name }} (dihapus)
                 </span>
               </div>
             </td>
             <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
               <button
                 class="text-red-600 hover:text-red-900"
-                @click="showDetail(customer)"
+                @click="showDetail(reservation)"
               >
                 Detail
               </button>
@@ -108,15 +117,15 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="!loading && customers.data.length > 0" class="py-4 px-4 border-t flex justify-between">
+      <div v-if="!loading && reservations.data.length > 0" class="py-4 px-4 border-t flex justify-between">
         <div class="my-auto">
           <p class="text-sm text-gray-700">
             Menampilkan
-            <span class="font-bold">{{ customers.from }}</span>
+            <span class="font-bold">{{ reservations.from }}</span>
             ke
-            <span class="font-bold">{{ customers.to }}</span>
+            <span class="font-bold">{{ reservations.to }}</span>
             dari
-            <span class="font-bold">{{ customers.total }}</span>
+            <span class="font-bold">{{ reservations.total }}</span>
             hasil
           </p>
         </div>
@@ -126,9 +135,9 @@
               class="relative inline-flex items-center px-2 py-2 rounded-l-md
               border border-gray-300 bg-white text-sm font-medium text-gray-500
               hover:bg-gray-50"
-              :disabled="customers.prev_page_url === null"
-              :class="[ customers.prev_page_url === null ? 'bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer' ]"
-              @click="getPage(customers.prev_page_url)"
+              :disabled="reservations.prev_page_url === null"
+              :class="[ reservations.prev_page_url === null ? 'bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer' ]"
+              @click="getPage(reservations.prev_page_url)"
             >
               <span class="sr-only">Previous</span>
               <!-- Heroicon name: solid/chevron-left -->
@@ -137,7 +146,7 @@
               </svg>
             </button>
             <button
-              v-for="(data, key) in customers.links.slice(1, -1)"
+              v-for="(data, key) in reservations.links.slice(1, -1)"
               :key="key"
               class="inline-flex relative items-center px-4 py-2 border
               border-gray-300 bg-white text-sm font-medium text-gray-500
@@ -154,9 +163,9 @@
               class="relative inline-flex items-center px-2 py-2 rounded-r-md
               border border-gray-300 bg-white text-sm font-medium text-gray-500
               hover:bg-gray-100"
-              :disabled="customers.next_page_url === null"
-              :class="[ customers.next_page_url === null ? 'bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer' ]"
-              @click="getPage(customers.next_page_url)"
+              :disabled="reservations.next_page_url === null"
+              :class="[ reservations.next_page_url === null ? 'bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer' ]"
+              @click="getPage(reservations.next_page_url)"
             >
               <span class="sr-only">Next</span>
               <!-- Heroicon name: solid/chevron-right -->
@@ -172,56 +181,35 @@
 </template>
 
 <script>
-import _ from 'lodash'
-
 export default {
   data () {
     return {
-      isTyping: false,
-      search: '',
       loading: true,
       loadingAPI: true,
-      customers: []
+      reservations: []
     }
   },
   async fetch () {
-    await this.$axios.$get('customer').then((res) => {
+    await this.$axios.$get('reservation').then((res) => {
       this.loading = false
       this.loadingAPI = false
-      this.customers = res.data
+      this.reservations = res.data
     })
   },
   head () {
     return {
-      title: 'Data Pelanggan'
-    }
-  },
-  watch: {
-    search: _.debounce(function () {
-      this.isTyping = false
-    }, 500),
-    isTyping (state) {
-      if (!state) {
-        this.searchCustomer()
-      }
+      title: 'Data Reservasi'
     }
   },
   methods: {
     showDetail (data) {
-      this.$router.push('/dashboard/pelanggan/' + data.id)
+      this.$router.push('/dashboard/reservasi/' + data.id)
     },
     async getPage (link) {
       this.loadingAPI = true
-      await this.$axios.$get('customer' + link).then((res) => {
+      await this.$axios.$get('reservation' + link).then((res) => {
         this.loadingAPI = false
-        this.customers = res.data
-      })
-    },
-    async searchCustomer () {
-      this.loadingAPI = true
-      await this.$axios.$get('search/customer?query=' + this.search).then((res) => {
-        this.loadingAPI = false
-        this.customers = res.data
+        this.reservations = res.data
       })
     }
   }

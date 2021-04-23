@@ -72,7 +72,9 @@ export default {
         'faCog',
         'faTrash',
         'faPencilAlt',
-        'faPowerOff'
+        'faPowerOff',
+        'faEllipsisV',
+        'faChevronDown'
       ]
     }
   },
@@ -81,17 +83,19 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    '@nuxtjs/auth-next',
+    ['nuxt-tailvue', { all: true, toast: { defaults: { containerClasses: ['mt-20'] } } }]
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'https://api.atmakoreanbbq.com/api'
+    baseURL: 'http://localhost/api'
   },
 
+  echo: {},
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {
-  },
+  build: {},
 
   router: {
     middleware: ['auth']

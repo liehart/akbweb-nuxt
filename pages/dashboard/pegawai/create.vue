@@ -369,10 +369,27 @@ export default {
     },
     createEmployeeAPI () {
       this.$axios.post('employee', this.form).then((res) => {
-        console.log(res)
         this.back()
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data pegawai ' + this.form.name + ' berhasil dibuat.',
+          timeout: 3
+        })
       }).catch((err) => {
-        console.log(err)
+        if (err.response) {
+          if (err.response.data.message === 'V_ERR') {
+            const errors = err.response.data.data
+            for (const key in errors) {
+              this.$toast.show({
+                type: 'danger',
+                title: 'Error',
+                message: errors[key][0],
+                timeout: 3
+              })
+            }
+          }
+        }
       })
     },
     createEmployee () {

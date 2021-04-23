@@ -133,7 +133,7 @@
         </dl>
       </div>
     </div>
-    <Modal v-model="deactivateModal" @click="deactivateEmployeeAPI(employee.data)">
+    <Modal class="z-50" v-model="deactivateModal" @click="deactivateEmployeeAPI(employee.data)">
       <template #title>
         Nonaktifkan Pegawai
       </template>
@@ -141,7 +141,7 @@
         Apakah anda yakin akan menonaktifkan akun pegawai <span class="font-bold">{{ employee.data.name }}</span>?
       </template>
     </Modal>
-    <Modal v-model="activateModal" @click="activateEmployeeAPI(employee.data)">
+    <Modal class="z-50" v-model="activateModal" @click="activateEmployeeAPI(employee.data)">
       <template #title>
         Aktifkan Pegawai
       </template>
@@ -149,7 +149,7 @@
         Apakah anda yakin akan mengaktifkan akun pegawai <span class="font-bold">{{ employee.data.name }}</span>?
       </template>
     </Modal>
-    <Modal v-model="deleteModal" @click="deleteEmployeeAPI(employee.data)">
+    <Modal class="z-50" v-model="deleteModal" @click="deleteEmployeeAPI(employee.data)">
       <template #title>
         Hapus Pegawai
       </template>
@@ -196,16 +196,36 @@ export default {
       }
     },
     async deactivateEmployeeAPI (data) {
-      await this.$axios.$post('employee/' + data.id + '/deactivate')
-      await this.$nuxt.refresh()
+      await this.$axios.$post('employee/' + data.id + '/deactivate').then(() => {
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Pegawai ' + data.name + ' berhasil dinonaktifkan.',
+          timeout: 3
+        })
+        this.$nuxt.refresh()
+      })
     },
     async activateEmployeeAPI (data) {
-      await this.$axios.$post('employee/' + data.id + '/activate')
-      await this.$nuxt.refresh()
+      await this.$axios.$post('employee/' + data.id + '/activate').then(() => {
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Pegawai ' + data.name + ' berhasil diaktifkan.',
+          timeout: 3
+        })
+        this.$nuxt.refresh()
+      })
     },
     async deleteEmployeeAPI (data) {
       await this.$axios.$delete('employee/' + data.id)
       await this.$router.push('/dashboard/pegawai')
+      this.$toast.show({
+        type: 'success',
+        title: 'Berhasil',
+        message: 'Data pegawai ' + data.name + ' berhasil dihapus.',
+        timeout: 3
+      })
     }
   }
 }
