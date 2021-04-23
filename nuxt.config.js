@@ -94,7 +94,7 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'http://localhost/api'
+    baseURL: process.env.API_URL || 'http://localhost/api'
   },
 
   echo: {},
