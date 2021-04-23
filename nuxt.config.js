@@ -28,7 +28,12 @@ export default {
       },
       plugins: [
         require('@tailwindcss/forms')
-      ]
+      ],
+      purge: {
+        content: [
+          'node_modules/tv-*/dist/tv-*.umd.min.js'
+        ]
+      }
     }
   },
 
