@@ -20,8 +20,7 @@
         >
       </div>
       <NuxtLink
-        v-if="$auth.hasScope('employee.create')"
-        v-if="createButton"
+        v-if="$auth.hasScope('customer.create')"
         to="/dashboard/pelanggan/create"
         class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
@@ -184,8 +183,7 @@ export default {
       search: '',
       loading: true,
       loadingAPI: true,
-      customers: [],
-      createButton: true
+      customers: []
     }
   },
   async fetch () {
