@@ -20,6 +20,7 @@
         >
       </div>
       <NuxtLink
+        v-if="$auth.hasScope('employee.create')"
         v-if="createButton"
         to="/dashboard/pelanggan/create"
         class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm

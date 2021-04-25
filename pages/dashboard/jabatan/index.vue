@@ -20,6 +20,7 @@
         >
       </div>
       <NuxtLink
+        v-if="$auth.hasScope('role.create')"
         to="/dashboard/jabatan/create"
         class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
