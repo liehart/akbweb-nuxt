@@ -134,8 +134,8 @@
 
 <script>
 import { email, maxLength, minLength, numeric, required } from 'vuelidate/lib/validators'
-
 export default {
+  middleware: 'customer/create',
   validations: {
     form: {
       name: {

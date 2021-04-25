@@ -222,6 +222,7 @@
 import { email, maxLength, minLength, minValue, numeric, required } from 'vuelidate/lib/validators'
 
 export default {
+  middleware: 'employee/update',
   validations: {
     form: {
       name: {

@@ -16,8 +16,6 @@ export const actions = {
     try {
       const res = await this.$axios.get('select/role')
       commit('setRoleList', res.data.data)
-    } catch (e) {
-      console.log(e)
-    }
+    } catch (e) {}
   }
 }

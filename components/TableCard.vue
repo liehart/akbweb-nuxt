@@ -32,11 +32,11 @@
         >
           Detail Meja
         </NuxtLink>
-        <a
-          class="w-full text-left text-sm text-gray-900 hover:bg-red-600 hover:text-white block px-4 py-2 cursor-pointer"
-        >
-          Lihat Pesanan
-        </a>
+        <!--        <a-->
+        <!--          class="w-full text-left text-sm text-gray-900 hover:bg-red-600 hover:text-white block px-4 py-2 cursor-pointer"-->
+        <!--        >-->
+        <!--          Lihat Pesanan-->
+        <!--        </a>-->
       </div>
     </div>
   </div>

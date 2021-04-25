@@ -140,8 +140,18 @@ export default {
         }).then(() => {
           this.$router.push('/dashboard')
         }).catch((err) => {
+          if (err.response) {
+            if (err.response.data.message) {
+              this.$toast.show({
+                type: 'danger',
+                title: 'Gagal Login',
+                message: err.response.data.message,
+                timeout: 3
+              })
+            }
+          }
+        }).finally(() => {
           this.loading = false
-          alert(err)
         })
       }
     }

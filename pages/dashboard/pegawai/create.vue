@@ -237,7 +237,7 @@
                     </span>
                   </div>
                 </div>
-                <div class="col-span-1 sm:col-span-1">
+                <div class="col-span-1">
                   <label class="block text-sm font-medium text-gray-700" for="confirm_password">
                     Konfirmasi Password
                   </label>
@@ -280,6 +280,7 @@
 import { email, maxLength, minLength, minValue, numeric, required, sameAs } from 'vuelidate/lib/validators'
 
 export default {
+  middleware: 'employee/create',
   validations: {
     form: {
       name: {

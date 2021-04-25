@@ -136,6 +136,7 @@
 import { email, maxLength, minLength, numeric, required } from 'vuelidate/lib/validators'
 
 export default {
+  middleware: 'customer/update',
   validations: {
     form: {
       name: {

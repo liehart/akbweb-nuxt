@@ -194,6 +194,7 @@
 import _ from 'lodash'
 
 export default {
+  middleware: 'role/read',
   data () {
     return {
       isTyping: false,

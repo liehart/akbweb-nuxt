@@ -10,6 +10,7 @@
         </div>
         <div class="flex my-auto">
           <button
+            v-if="$auth.hasScope('table.update')"
             class="text-gray-500 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm
             font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2
             focus:ring-offset-2 focus:ring-gray-500"
@@ -18,6 +19,7 @@
             Edit
           </button>
           <button
+            v-if="$auth.hasScope('table.delete')"
             type="submit"
             class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
@@ -69,6 +71,7 @@
 
 <script>
 export default {
+  middleware: 'table/read',
   async asyncData ({ params, $axios, error }) {
     try {
       const role = await $axios.$get('table/' + params.id)
@@ -103,13 +106,25 @@ export default {
       }
     },
     async deleteEmployeeAPI (data) {
-      await this.$axios.$delete('table/' + data.table_number)
-      await this.$router.push('/dashboard/meja')
-      this.$toast.show({
-        type: 'success',
-        title: 'Berhasil',
-        message: 'Data meja bernomor ' + data.table_number + ' berhasil dihapus.',
-        timeout: 3
+      await this.$axios.$delete('table/' + data.table_number).then(() => {
+        this.$router.push('/dashboard/meja')
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data meja bernomor ' + data.table_number + ' berhasil dihapus.',
+          timeout: 3
+        })
+      }).catch((err) => {
+        if (err.response) {
+          if (err.response.data.message === 'IN_USE') {
+            this.$toast.show({
+              type: 'danger',
+              title: 'Error',
+              message: 'Meja tidak dapat dihapus karena sedang digunakan',
+              timeout: 3
+            })
+          }
+        }
       })
     }
   }

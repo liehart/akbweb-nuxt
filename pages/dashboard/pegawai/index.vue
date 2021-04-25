@@ -27,13 +27,14 @@
       </NuxtLink>
     </div>
     <div
-      class="shadow overflow-hidden border-b bg-white border-gray-200 sm:rounded-lg">
+      class="shadow overflow-hidden border-b bg-white border-gray-200 sm:rounded-lg"
+    >
       <div
         class="h-1"
         :class="[ loadingAPI ? 'bg-red-200' : 'bg-gray-50' ]"
       >
         <div v-if="loadingAPI">
-          <div class="loading-bar h-1 bg-red-500"></div>
+          <div class="loading-bar h-1 bg-red-500" />
         </div>
       </div>
       <table class="table-fixed min-w-full divide-y divide-gray-200">
@@ -99,7 +100,12 @@
             </td>
             <td class="px-4 py-4">
               <div class="text-sm text-gray-500">
-                {{ employee.role.name }}
+                <span v-if="employee.role">
+                  {{ employee.role.name }}
+                </span>
+                <span v-else class="italic text-gray-400">
+                  Tanpa Jabatan
+                </span>
               </div>
             </td>
             <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -187,6 +193,7 @@
 import _ from 'lodash'
 
 export default {
+  middleware: 'employee/read',
   data () {
     return {
       isTyping: false,

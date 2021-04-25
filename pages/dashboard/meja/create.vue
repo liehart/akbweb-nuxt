@@ -83,6 +83,7 @@
 import { numeric, required } from 'vuelidate/lib/validators'
 
 export default {
+  middleware: 'table/create',
   validations: {
     form: {
       table_number: {

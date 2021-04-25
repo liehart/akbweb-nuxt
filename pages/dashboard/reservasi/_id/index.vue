@@ -4,22 +4,21 @@
       <div class="flex justify-between">
         <div class="flex-col my-auto">
           <h1 class="text-4xl font-bold">
-            {{ role.data.name }}
+            Reservasi {{ reservation.data.customer.name }}
           </h1>
-          <p>Detail data jabatan</p>
+          <p>{{ moment(reservation.data.date).format('DD MMMM YYYY') }} - Meja No {{ reservation.data.table_number }}</p>
         </div>
         <div class="flex my-auto">
           <button
-            v-if="role.data.locked !== 1"
             class="text-gray-500 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm
             font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2
             focus:ring-offset-2 focus:ring-gray-500"
-            @click="edit(role.data.id)"
+            @click="edit(reservation.data.id)"
           >
             Edit
           </button>
           <button
-            v-if="role.data.locked !== 1"
+            v-if="reservation.data.locked !== 1"
             type="submit"
             class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
@@ -34,61 +33,70 @@
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
       <div class="border-t border-gray-200">
         <dl>
-          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">
-              Nama
+              Tanggal Reservasi
             </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {{ role.data.name }} <span class="italic text-gray-500">({{ role.data.slug }})</span>
+              {{ moment(reservation.data.date).format('DD MMMM YYYY') }}
+            </dd>
+          </div>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">
+              Nama Customer
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              {{ reservation.data.customer.name }}
             </dd>
           </div>
           <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">
-              Jabatan Inti
+              Nomor Meja
             </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              <span v-if="role.data.locked" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                Ya
-              </span>
-              <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                Tidak
-              </span>
+              {{ reservation.data.table_number }}
             </dd>
           </div>
           <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">
-              Permissions
+              Sesi Reservasi
             </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              <div v-for="(data, key) in role.data.permission" :key="key" class="mb-2">
-                <p>{{ data.label }} <span class="italic text-gray-500">({{ data.name }})</span></p>
-                <p class="text-xs text-gray-700">
-                  {{ data.description }}
-                </p>
-              </div>
+              <span v-if="reservation.data.session === 'lunch'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                Makan Siang
+              </span>
+              <span v-else-if="reservation.data.session === 'dinner'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                Makan Malam
+              </span>
+              <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                Tanpa Reservasi
+              </span>
             </dd>
           </div>
         </dl>
       </div>
     </div>
-    <Modal v-model="deleteModal" class="z-50" @click="deleteEmployeeAPI(role.data)">
+    <Modal v-model="deleteModal" class="z-50" @click="deleteReservationAPI(reservation.data)">
       <template #title>
-        Hapus Jabatan Pegawai
+        Hapus Reservasi
       </template>
       <template #body>
-        Apakah anda yakin akan menghapus jabatan pegawai <span class="font-bold">{{ role.data.name }}</span>?
+        Apakah anda yakin akan menghapus data reservasi <span class="font-bold">{{ reservation.data.customer.name }}</span>
+        pada <span class="font-bold">{{ moment(reservation.data.date).format('DD MMMM YYYY') }}</span>?
       </template>
     </Modal>
   </div>
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
-  middleware: 'role/read',
+  middleware: 'reservation/read',
   async asyncData ({ params, $axios, error }) {
     try {
-      const role = await $axios.$get('role/' + params.id)
-      return { role }
+      const reservation = await $axios.$get('reservation/' + params.id)
+      return { reservation }
     } catch (err) {
       if (err.response.status === 404) {
         error({ statusCode: 404, message: err.message })
@@ -97,39 +105,18 @@ export default {
   },
   data () {
     return {
-      deactivateModal: false,
-      activateModal: false,
       deleteModal: false,
-      form: {
-        checkbox: [
-          {
-            name: 'Read',
-            acls: [1, 2, 3, 4, 5]
-          },
-          {
-            name: 'Create',
-            acls: [3, 4, 5]
-          },
-          {
-            name: 'Modify',
-            acls: [2, 4, 5]
-          },
-          {
-            name: 'Delete',
-            acls: [5]
-          }
-        ]
-      }
+      moment
     }
   },
   head () {
     return {
-      title: this.role.data.name
+      title: this.reservation.data.name
     }
   },
   methods: {
     edit (id) {
-      this.$router.push('/dashboard/jabatan/' + id + '/edit')
+      this.$router.push('/dashboard/reservasi/' + id + '/edit')
     },
     showModal (val) {
       if (!val) {
@@ -138,13 +125,13 @@ export default {
         this.activateModal = true
       }
     },
-    async deleteEmployeeAPI (data) {
-      await this.$axios.$delete('role/' + data.id)
-      await this.$router.push('/dashboard/jabatan')
+    async deleteReservationAPI (data) {
+      await this.$axios.$delete('reservation/' + data.id)
+      await this.$router.push('/dashboard/reservasi')
       this.$toast.show({
         type: 'success',
         title: 'Berhasil',
-        message: 'Data jabatan ' + data.name + ' berhasil dihapus.',
+        message: 'Data reservasi ' + data.name + ' berhasil dihapus.',
         timeout: 3
       })
     }

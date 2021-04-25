@@ -6,7 +6,14 @@
           <h1 class="text-4xl font-bold">
             {{ employee.data.name }}
           </h1>
-          <p>{{ employee.data.role.name }}</p>
+          <p>
+            <span v-if="employee.data.role">
+              {{ employee.data.role.name }}
+            </span>
+            <span v-else class="italic text-gray-400">
+              Tanpa Jabatan
+            </span>
+          </p>
         </div>
         <div class="flex my-auto">
           <button
@@ -119,7 +126,12 @@
               Jabatan
             </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {{ employee.data.role.name }}
+              <span v-if="employee.data.role">
+                {{ employee.data.role.name }}
+              </span>
+              <span v-else class="italic text-gray-400">
+                Tanpa Jabatan
+              </span>
             </dd>
           </div>
           <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -133,7 +145,7 @@
         </dl>
       </div>
     </div>
-    <Modal class="z-50" v-model="deactivateModal" @click="deactivateEmployeeAPI(employee.data)">
+    <Modal v-model="deactivateModal" class="z-50" @click="deactivateEmployeeAPI(employee.data)">
       <template #title>
         Nonaktifkan Pegawai
       </template>
@@ -141,7 +153,7 @@
         Apakah anda yakin akan menonaktifkan akun pegawai <span class="font-bold">{{ employee.data.name }}</span>?
       </template>
     </Modal>
-    <Modal class="z-50" v-model="activateModal" @click="activateEmployeeAPI(employee.data)">
+    <Modal v-model="activateModal" class="z-50" @click="activateEmployeeAPI(employee.data)">
       <template #title>
         Aktifkan Pegawai
       </template>
@@ -149,7 +161,7 @@
         Apakah anda yakin akan mengaktifkan akun pegawai <span class="font-bold">{{ employee.data.name }}</span>?
       </template>
     </Modal>
-    <Modal class="z-50" v-model="deleteModal" @click="deleteEmployeeAPI(employee.data)">
+    <Modal v-model="deleteModal" class="z-50" @click="deleteEmployeeAPI(employee.data)">
       <template #title>
         Hapus Pegawai
       </template>
@@ -162,6 +174,7 @@
 
 <script>
 export default {
+  middleware: 'employee/read',
   async asyncData ({ params, $axios, error }) {
     try {
       const employee = await $axios.$get('employee/' + params.id)

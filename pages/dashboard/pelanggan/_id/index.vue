@@ -70,7 +70,7 @@
         </dl>
       </div>
     </div>
-    <Modal class="z-50" v-model="deleteModal" @click="deleteCustomerAPI(customer.data)">
+    <Modal v-model="deleteModal" class="z-50" @click="deleteCustomerAPI(customer.data)">
       <template #title>
         Hapus Pelanggan
       </template>
@@ -83,6 +83,7 @@
 
 <script>
 export default {
+  middleware: 'customer/read',
   async asyncData ({ params, $axios, error }) {
     try {
       const customer = await $axios.$get('customer/' + params.id)

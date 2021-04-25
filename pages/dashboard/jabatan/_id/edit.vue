@@ -4,7 +4,7 @@
       <div class="flex justify-between">
         <div class="flex-col my-auto">
           <h1 class="text-4xl font-bold">
-            Edit {{ this.title }}
+            Edit {{ title }}
           </h1>
           <p>Menu untuk mengedit jabatan pegawai baru</p>
         </div>
@@ -96,14 +96,65 @@
           </form>
         </div>
       </div>
+      <div aria-hidden="true" class="hidden sm:block">
+        <div class="py-5">
+          <div class="border-t border-gray-200" />
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-6">
+        <div class="col-span-1">
+          <div class="px-4 sm:px-0">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">
+              Data Permission
+            </h3>
+            <p class="mt-1 text-sm text-gray-600">
+              Bagian ini berisi data permission dari role pegawai.
+            </p>
+          </div>
+        </div>
+        <div class="col-span-3">
+          <div class="shadow sm:rounded-md sm:overflow-hidden">
+            <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+              <div class="grid grid-cols-2 gap-4">
+                <div v-for="(data, key) in permissions.data" :key="key" @click="selectPermission(data.id)">
+                  <div
+                    class="transition duration-200 select-none flex justify-between p-3 rounded-md cursor-pointer border"
+                    :class="[ form.permission.includes(data.id) ? 'border-red-500 bg-red-50 hover:bg-red-100 border-red-500' : 'hover:bg-gray-50 border-gray-300' ]"
+                  >
+                    <div class="flex gap-2 text-sm">
+                      <div
+                        :class="[ form.permission.includes(data.id) ? 'text-red-600' : '' ]"
+                      >
+                        <p><span class="font-semibold">{{ data.label }}</span> <span class="italic text-gray-500">({{ data.name }})</span></p>
+                        <p class="text-gray-700 text-xs">
+                          {{ data.description }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="col-span-1 text-sm h-5 w-5 my-auto">
+                      <div v-if="form.permission.includes(data.id)" class="h-5 w-5 text-red-500 my-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { maxLength, required } from 'vuelidate/lib/validators'
+import _ from 'lodash'
 
 export default {
+  middleware: 'role/update',
   validations: {
     form: {
       name: {
@@ -112,20 +163,38 @@ export default {
       }
     }
   },
-  async fetch () {
-    await this.$axios.get('role/' + this.$route.params.id).then((res) => {
-      this.form = res.data.data
-      this.title = res.data.data.name
-    })
+  async asyncData ({
+    $axios,
+    error
+  }) {
+    try {
+      const permissions = await $axios.$get('select/permission')
+      return { permissions }
+    } catch (err) {
+      if (err.response.status === 404) {
+        error({
+          statusCode: 404,
+          message: err.message
+        })
+      }
+    }
   },
   data () {
     return {
       form: {
         name: '',
-        slug: ''
+        slug: '',
+        permission: []
       },
       submitted: false
     }
+  },
+  async fetch () {
+    await this.$axios.get('role/' + this.$route.params.id).then((res) => {
+      this.form = res.data.data
+      this.title = res.data.data.name
+      this.form.permission = _.map(this.form.permission, 'id')
+    })
   },
   head () {
     return {
@@ -138,8 +207,15 @@ export default {
     }
   },
   methods: {
+    selectPermission (id) {
+      if (this.form.permission.includes(id)) {
+        this.form.permission.splice(this.form.permission.indexOf(id), 1)
+      } else {
+        this.form.permission.push(id)
+      }
+    },
     back () {
-      this.$router.push('/dashboard/jabatan')
+      this.$router.push('/dashboard/jabatan/' + this.form.id)
     },
     createRoleAPI () {
       this.$axios.put('role/' + this.form.id, this.form).then((res) => {

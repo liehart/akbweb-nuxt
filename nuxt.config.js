@@ -109,13 +109,14 @@ export default {
   auth: {
     strategies: {
       local: {
+        scope: true,
         token: {
           property: 'data.token',
           required: true,
           type: 'Bearer'
         },
         user: {
-          property: 'data',
+          property: false,
           autoFetch: true
         },
         endpoints: {

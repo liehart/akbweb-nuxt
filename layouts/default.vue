@@ -19,6 +19,7 @@
         </div>
         <NuxtLink
           v-for="(data, key) in links"
+          v-show="$auth.hasScope(data.scope) || data.scope === 'main'"
           :key="key"
           :to="data.link"
           class="transition duration-200 flex my-1 text-gray-50 py-2 px-4
@@ -120,38 +121,44 @@ export default {
   data () {
     return {
       isOpen: false,
-      user: this.$auth.user,
+      user: this.$auth.user.user,
       messages: [],
       links: [
         {
           icon: 'home',
           link: '/dashboard',
-          name: 'Dashboard'
+          name: 'Dashboard',
+          scope: 'main'
         },
         {
           icon: 'user-tag',
           link: '/dashboard/jabatan',
-          name: 'Jabatan'
+          name: 'Jabatan',
+          scope: 'role.read'
         },
         {
           icon: 'user',
           link: '/dashboard/pegawai',
-          name: 'Pegawai'
+          name: 'Pegawai',
+          scope: 'employee.read'
         },
         {
           icon: 'chair',
           link: '/dashboard/meja',
-          name: 'Meja'
+          name: 'Meja',
+          scope: 'table.read'
         },
         {
           icon: 'users',
           link: '/dashboard/pelanggan',
-          name: 'Pelanggan'
+          name: 'Pelanggan',
+          scope: 'customer.read'
         },
         {
           icon: 'bookmark',
           link: '/dashboard/reservasi',
-          name: 'Reservasi'
+          name: 'Reservasi',
+          scope: 'reservation.read'
         }
       ]
     }

@@ -68,15 +68,15 @@
           <tr v-for="reservation in reservations.data" :key="reservation.id">
             <td class="px-4 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-500">
-                {{ reservation.reservation_date }}
+                {{ reservation.date }}
               </div>
             </td>
             <td class="px-4 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-500">
-                <span v-if="reservation.reservation_session === 'lunch'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                <span v-if="reservation.session === 'lunch'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                   Makan Siang
                 </span>
-                <span v-else-if="reservation.reservation_session === 'dinner'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                <span v-else-if="reservation.session === 'dinner'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                   Makan Malam
                 </span>
                 <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
@@ -86,7 +86,7 @@
             </td>
             <td class="px-4 py-4">
               <div class="text-sm text-gray-500">
-                {{ reservation.table_table_number }}
+                {{ reservation.table_number }}
               </div>
             </td>
             <td class="px-4 py-4">
@@ -182,6 +182,7 @@
 
 <script>
 export default {
+  middleware: 'reservation/read',
   data () {
     return {
       loading: true,

@@ -11,14 +11,17 @@
       <div class="flex w-full relative">
         <input
           ref="search"
+          v-model="search"
           type="text"
           name="search"
           class="w-full border rounded-lg px-3 py-2 text-sm w-full focus:ring-2
               focus:ring-blue-600 focus:outline-none"
           placeholder="Cari No Meja"
+          @input="isTyping = true"
         >
       </div>
       <NuxtLink
+        v-if="$auth.hasScope('table.create')"
         to="/dashboard/meja/create"
         class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
@@ -113,9 +116,14 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
+  middleware: 'table/read',
   data () {
     return {
+      isTyping: false,
+      search: '',
       loading: true,
       loadingAPI: true,
       tables: []
@@ -133,13 +141,34 @@ export default {
       title: 'Data Meja'
     }
   },
+  watch: {
+    search: _.debounce(function () {
+      this.isTyping = false
+    }, 500),
+    isTyping (state) {
+      if (!state) {
+        this.searchAPI()
+      }
+    }
+  },
   methods: {
     showDetail (data) {
       this.$router.push('/dashboard/meja/' + data.id)
     },
     async getPage (link) {
       this.loadingAPI = true
-      await this.$axios.$get('table' + link).then((res) => {
+      let url = 'table' + link
+      if (this.search !== '') {
+        url = 'search/table?query=' + this.search + '&' + link.substring(1)
+      }
+      await this.$axios.$get(url).then((res) => {
+        this.loadingAPI = false
+        this.tables = res.data
+      })
+    },
+    async searchAPI () {
+      this.loadingAPI = true
+      await this.$axios.$get('search/table?query=' + this.search).then((res) => {
         this.loadingAPI = false
         this.tables = res.data
       })
