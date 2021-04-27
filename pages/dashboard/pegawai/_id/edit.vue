@@ -423,6 +423,7 @@ export default {
       event.target.value = ''
     },
     deleteImage () {
+      this.form.properties = {}
       this.form.image_path = null
       this.form.image_delete = true
     },
