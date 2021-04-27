@@ -2,9 +2,9 @@
   <div class="flex">
     <aside
       class="relative h-screen flex flex-col flex-wrap bg-gray-900 flex-none w-64
-      animated faster shadow-md sticky top-0"
+      animated faster shadow-md sticky top-0 bg-image-dashboard"
     >
-      <div class="h-20 flex align-middle text-gray-200 bg-black px-3">
+      <div class="h-20 flex align-middle text-white px-3">
         <img src="~/assets/logo.svg" class="w-16 my-auto">
         <div class="my-auto">
           <p class="font-bold">
@@ -14,24 +14,41 @@
         </div>
       </div>
       <div class="p-3">
-        <div class="tracking-wider px-4 py-2 text-gray-500 text-sm font-bold">
+        <div class="tracking-wider px-4 py-2 text-gray-300 text-sm font-bold">
           MENU
         </div>
-        <NuxtLink
-          v-for="(data, key) in links"
-          v-show="$auth.hasScope(data.scope) || data.scope === 'main'"
-          :key="key"
-          :to="data.link"
-          class="transition duration-200 flex my-1 text-gray-50 py-2 px-4
-          rounded hover:bg-gray-800 cursor-pointer"
-        >
-          <div class="h-5 w-5 my-auto">
-            <font-awesome-icon :icon="data.icon" class="h-5 w-5 my-auto" />
-          </div>
-          <div class="ml-2 my-auto text-sm">
-            {{ data.name }}
-          </div>
-        </NuxtLink>
+        <div id="dashboard">
+          <NuxtLink
+            to="/dashboard"
+            :class="{ 'active' : $route.name === 'dashboard' }"
+            class="transition duration-200 flex my-1 py-2 px-4
+          rounded cursor-pointer"
+          >
+            <div class="h-5 w-5 my-auto text-white hover:opacity-100">
+              <font-awesome-icon icon="home" class="h-5 w-5 my-auto" />
+            </div>
+            <div class="ml-2 my-auto text-sm text-white hover:opacity-100">
+              Dashboard
+            </div>
+          </NuxtLink>
+        </div>
+        <div id="menu">
+          <NuxtLink
+            v-for="(data, key) in links"
+            v-show="$auth.hasScope(data.scope)"
+            :key="key"
+            :to="data.link"
+            class="transition duration-200 flex my-1 py-2 px-4
+          rounded cursor-pointer"
+          >
+            <div class="h-5 w-5 my-auto text-white hover:opacity-100">
+              <font-awesome-icon :icon="data.icon" class="h-5 w-5 my-auto" />
+            </div>
+            <div class="ml-2 my-auto text-sm text-white hover:opacity-100">
+              {{ data.name }}
+            </div>
+          </NuxtLink>
+        </div>
       </div>
     </aside>
     <main class="w-full bg-gray-100">
@@ -55,12 +72,14 @@
         </div>
         <div class="relative flex gap-4">
           <div class="my-auto text-right">
-            <h1 class="text-gray-900 font-bold">
-              {{ user.name }}
-            </h1>
-            <p class="text-xs text-gray-500">
+            <div>
+              <h1 class="text-gray-900 font-bold">
+                {{ user.name }}
+              </h1>
+            </div>
+            <div class="text-xs text-gray-500">
               {{ user.email }} - <span class="font-bold">{{ user.role.name }}</span>
-            </p>
+            </div>
           </div>
           <div
             class="flex-shrink-0 flex align-middle h-10 gap-2 cursor-pointer"
@@ -125,12 +144,6 @@ export default {
       messages: [],
       links: [
         {
-          icon: 'home',
-          link: '/dashboard',
-          name: 'Dashboard',
-          scope: 'main'
-        },
-        {
           icon: 'user-tag',
           link: '/dashboard/jabatan',
           name: 'Jabatan',
@@ -159,6 +172,42 @@ export default {
           link: '/dashboard/reservasi',
           name: 'Reservasi',
           scope: 'reservation.read'
+        },
+        {
+          icon: 'list',
+          link: '/dashboard/pesanan',
+          name: 'Pesanan',
+          scope: 'order.read'
+        },
+        {
+          icon: 'money-check-alt',
+          link: '/dashboard/transaksi',
+          name: 'Transaksi',
+          scope: 'transaction.read'
+        },
+        {
+          icon: 'utensils',
+          link: '/dashboard/menu',
+          name: 'Menu',
+          scope: 'menu.read'
+        },
+        {
+          icon: 'truck-loading',
+          link: '/dashboard/bahan',
+          name: 'Bahan',
+          scope: 'ingredient.read'
+        },
+        {
+          icon: 'history',
+          link: '/dashboard/stok',
+          name: 'Stok',
+          scope: 'stock.read'
+        },
+        {
+          icon: 'print',
+          link: '/dashboard/laporan',
+          name: 'laporan',
+          scope: 'report.read'
         }
       ]
     }
@@ -215,3 +264,27 @@ export default {
   }
 }
 </script>
+
+<style>
+.bg-image-dashboard {
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.5)
+  ),
+  url("~/assets/seoul.jpeg") no-repeat;
+  background-size: cover;
+  background-position: bottom;
+}
+
+#menu a.nuxt-link-active {
+  background: rgba(45, 55, 72, 0.5);
+}
+
+.active {
+  background: rgba(45, 55, 72, 0.5);
+}
+
+aside a:hover {
+  background: rgba(45, 55, 72, 0.5);
+}
+</style>

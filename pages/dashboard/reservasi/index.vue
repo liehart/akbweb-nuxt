@@ -12,8 +12,7 @@
           ref="search"
           type="text"
           name="search"
-          class="w-full border rounded-lg px-3 py-2 text-sm w-full focus:ring-2
-              focus:ring-blue-600 focus:outline-none"
+          class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
           placeholder="Cari Reservasi"
         >
       </div>
@@ -22,9 +21,14 @@
         to="/dashboard/reservasi/create"
         class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
-            focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap"
+            focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap justify-between flex"
       >
-        Tambah Reservasi
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+        </svg>
+        <span class="pl-2">
+          Buat Reservasi
+        </span>
       </NuxtLink>
     </div>
     <div
@@ -45,6 +49,9 @@
               Tanggal
             </th>
             <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Sesi
             </th>
             <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -60,7 +67,7 @@
         </thead>
         <tbody v-if="loading" class="bg-white divide-y divide-gray-200">
           <tr>
-            <td colspan="4" class="text-center py-5 text-gray-500 text-sm">
+            <td colspan="5" class="text-center py-5 text-gray-500 text-sm">
               Loading...
             </td>
           </tr>
@@ -74,11 +81,27 @@
             </td>
             <td class="px-4 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-500">
+                <span v-if="reservation.status === 'new'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  New
+                </span>
+                <span v-else-if="reservation.status === 'in'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                  In Seat
+                </span>
+                <span v-else-if="reservation.status === 'done'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                  Done
+                </span>
+                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                  Cancelled
+                </span>
+              </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-500">
                 <span v-if="reservation.session === 'lunch'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                  Makan Siang
+                  Lunch
                 </span>
                 <span v-else-if="reservation.session === 'dinner'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                  Makan Malam
+                  Dinner
                 </span>
                 <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
                   Tanpa Reservasi
@@ -86,8 +109,20 @@
               </div>
             </td>
             <td class="px-4 py-4">
-              <div class="text-sm text-gray-500">
-                {{ reservation.table_number }}
+              <div class="text-sm text-gray-500 flex gap-1">
+                <div class="my-auto">
+                  {{ reservation.table_number }}
+                </div>
+                <div v-if="!reservation.table" class="has-tooltip my-auto text-red-500 cursor-pointer">
+                  <span class="tooltip text-xs text-gray-500 bg-white rounded border border-gray-200 shadow-lg px-2 p-1 ml-6 -mt-3.5">
+                    <span class="font-bold">Meja telah dihapus</span>
+                    <br>
+                    Ganti meja untuk melanjutkan reservasi
+                  </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </div>
               </div>
             </td>
             <td class="px-4 py-4">
@@ -112,7 +147,7 @@
         </tbody>
         <tbody v-else class="bg-white divide-y divide-gray-200">
           <tr>
-            <td colspan="4" class="text-center py-5 text-gray-500 text-sm">
+            <td colspan="5" class="text-center py-5 text-gray-500 text-sm">
               Tidak ada data
             </td>
           </tr>
@@ -257,5 +292,13 @@ export default {
     transform: scaleX(0) }
   100% {
     transform: translateX(-100%)}
+}
+
+.tooltip {
+  @apply invisible absolute
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible z-50
 }
 </style>

@@ -227,7 +227,7 @@
                   <label class="block text-sm font-medium text-gray-700">
                     Sesi Reservasi
                   </label>
-                  <div class="grid grid-cols-3 gap-4 mt-1">
+                  <div class="grid grid-cols-2 gap-4 mt-1">
                     <div v-for="(data, key) in sessionList" :key="key" @click="selectSession(data.value)">
                       <div
                         class="transition duration-200 select-none grid grid-cols-9 p-5 rounded-md cursor-pointer border"
@@ -268,8 +268,8 @@
                   </label>
                   <div class="grid grid-cols-9 gap-2 mt-1 mb-2">
                     <button
-                      :disabled="prevDateState || isOffHoursReservation"
-                      :class="[ prevDateState || isOffHoursReservation ? 'text-gray-500 bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer']"
+                      :disabled="prevDateState"
+                      :class="[ prevDateState ? 'text-gray-500 bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer']"
                       class="transition duration-200 select-none grid p-2 rounded-md
                       border text-sm hover:bg-gray-50 border-gray-300 focus:outline-none
                       text-left"
@@ -289,9 +289,7 @@
                     <button
                       v-for="(data, key) in dateList"
                       :key="key"
-                      :disabled="isOffHoursReservation"
-                      :class="[ isOffHoursReservation ? 'text-gray-500 bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer hover:bg-gray-50 border-gray-300']"
-                      class="transition rounded-md duration-200 select-none grid
+                      class="cursor-pointer hover:bg-gray-50 border-gray-300 transition rounded-md duration-200 select-none grid
                       text-sm border-gray-300 focus:outline-none
                       text-left"
                       @click="selectDate(data.date)"
@@ -316,10 +314,9 @@
                       </div>
                     </button>
                     <button
-                      :disabled="isOffHoursReservation"
-                      :class="[ isOffHoursReservation ? 'text-gray-500 bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer']"
                       class="transition duration-200 select-none grid p-2 rounded-md
                       border text-sm hover:bg-gray-50 border-gray-300 focus:outline-none
+                      cursor-pointer
                       text-left"
                       @click="nextDate"
                     >
@@ -388,41 +385,65 @@
                 >
               </div>
             </div>
-            <div v-if="loadingTable" class="text-center py-5 text-gray-500 text-sm">
+            <div v-if="initialLoading" class="text-center py-5 text-gray-500 text-sm">
               Loading...
             </div>
-            <div v-else-if="!loadingTable && tables.data.length > 0">
+            <div v-else-if="!initialLoading && tables.data.length > 0">
               <div class="grid grid-cols-3 gap-4 pt-0 p-5">
-                <div v-for="(data, key) in tables.data" :key="key" @click="selectTable(data.table_number)">
+                <button
+                  v-for="(data, key) in tables.data"
+                  :key="key"
+                  class="focus:outline-none"
+                  :disabled="data.reservation.length > 0 || data.is_empty === 1"
+                  :class="[data.reservation.length > 0 || data.is_empty === 1 ? 'cursor-not-allowed' : 'cursor-pointer']"
+                  @click="selectTable(data.table_number)"
+                >
                   <div
-                    class="transition duration-200 select-none flex justify-between p-5 rounded-md cursor-pointer border"
-                    :class="[ form.table_number === data.table_number ? 'border-red-500 bg-red-50 hover:bg-red-100 border-red-500' : 'hover:bg-gray-50 border-gray-300' ]"
+                    class="transition duration-200 select-none flex justify-between p-5 rounded-md border flex-col"
+                    :class="[
+                      data.reservation.length > 0 || data.is_empty === 1
+                        ? [
+                          data.reservation.length > 0 || data.is_empty === 1
+                            ? 'cursor-not-allowed'
+                            : 'cursor-pointer'
+                        ]
+                        : [
+                          form.table_number === data.table_number
+                            ? 'border-red-500 bg-red-50 hover:bg-red-100 border-red-500'
+                            : 'hover:bg-gray-50 border-gray-300'
+                        ]
+                    ]"
                   >
-                    <div class="flex gap-2 text-sm">
-                      <div
-                        class="font-semibold truncate"
-                        :class="[ form.table_number === data.table_number ? 'text-red-600' : '' ]"
-                      >
-                        {{ data.table_number }}
+                    <div class="flex justify-between">
+                      <div class="flex gap-2 text-sm">
+                        <div
+                          class="font-semibold truncate"
+                          :class="[ form.table_number === data.table_number ? 'text-red-600' : '' ]"
+                        >
+                          {{ data.table_number }}
+                        </div>
+                        <div>
+                          <span v-if="data.reservation.length > 0" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            Reserved
+                          </span>
+                          <span v-else-if="!data.is_empty" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                            Kosong
+                          </span>
+                          <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                            Terisi
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <span v-if="!data.is_empty" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          Kosong
-                        </span>
-                        <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                          Terisi
-                        </span>
-                      </div>
-                    </div>
-                    <div class="col-span-1 text-sm h-5 w-5 my-auto">
-                      <div v-if="form.table_number === data.table_number" class="h-5 w-5 text-red-500 my-auto">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
+                      <div class="col-span-1 text-sm h-5 w-5 my-auto">
+                        <div v-if="form.table_number === data.table_number" class="h-5 w-5 text-red-500 my-auto">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </button>
                 <span v-if="submitted && !$v.form.table_number.minValue" class="text-xs text-red-500">
                   Meja harus dipilih
                 </span>
@@ -431,7 +452,7 @@
             <div v-else class="text-center py-5 text-gray-500 text-sm mb-5">
               Data meja tidak ditemukan
             </div>
-            <div v-if="!loadingTable" class="py-4 px-4 border-t flex justify-between">
+            <div v-if="!initialLoading" class="py-4 px-4 border-t flex justify-between">
               <div class="my-auto">
                 <p class="text-sm text-gray-700">
                   Menampilkan
@@ -546,10 +567,11 @@ export default {
     return {
       form: {
         customer_id: 0,
-        session: '',
+        session: 'lunch',
         date: '',
         table_number: 0
       },
+      initialLoading: false,
       submitted: false,
       isTyping: false,
       search: '',
@@ -566,41 +588,32 @@ export default {
         {
           data: {
             name: 'Lunch',
-            time: '11.00-14.00'
+            time: '11.00-16.00'
           },
           value: 'lunch'
         },
         {
           data: {
             name: 'Dinner',
-            time: '19.00-22.00'
+            time: '17.00-21.00'
           },
           value: 'dinner'
-        },
-        {
-          data: {
-            name: 'Off Hours',
-            time: 'No Time (Hanya dilayani hari H)'
-          },
-          value: 'other'
         }
       ]
     }
   },
   async fetch () {
+    this.initialLoading = true
     await this.$axios.$get('customer').then((res) => {
       this.loading = false
       this.loadingAPI = false
       this.customers = res.data
     })
-    await this.$axios.$get('table').then((res) => {
-      this.loadingTable = false
-      this.loadingTableAPI = false
-      this.tables = res.data
-    })
     const now = moment()
     this.form.date = now.format('YYYY-MM-DD')
     await this.generateDate(now)
+    await this.getAPI('', this.form.date, this.form.session)
+    this.initialLoading = false
   },
   head () {
     return {
@@ -615,9 +628,6 @@ export default {
         }
       }
       return true
-    },
-    isOffHoursReservation () {
-      return this.form.session === 'other'
     }
   },
   watch: {
@@ -673,26 +683,25 @@ export default {
       }
       this.$v.form.customer_id.$touch()
     },
-    selectDate (date) {
+    async selectDate (date) {
       if (this.form.date === date) {
         this.form.date = ''
       } else {
         this.form.date = date
       }
       this.$v.form.date.$touch()
+      this.form.table_number = 0
+      await this.getAPI('', this.form.date, this.form.session)
     },
-    selectSession (value) {
+    async selectSession (value) {
       if (this.form.session === value) {
         this.form.session = ''
       } else {
         this.form.session = value
-        if (this.form.session === 'other') {
-          const now = moment()
-          this.form.date = now.format('YYYY-MM-DD')
-          this.generateDate(now)
-        }
       }
       this.$v.form.session.$touch()
+      this.form.table_number = 0
+      await this.getAPI('', this.form.date, this.form.session)
     },
     selectTable (value) {
       if (this.form.table_number === value) {
@@ -752,7 +761,7 @@ export default {
       this.loadingAPI = true
       let url = 'table' + link
       if (this.search !== '') {
-        url = 'search/table?query=' + this.search + '&' + link.substring(1)
+        url = 'table?query=' + this.search + '&' + link.substring(1)
       }
       await this.$axios.$get(url).then((res) => {
         this.loadingAPI = false
@@ -760,10 +769,15 @@ export default {
       })
     },
     async searchAPITable () {
-      this.loadingAPI = true
-      await this.$axios.$get('search/table?query=' + this.searchTable).then((res) => {
-        this.loadingAPI = false
+      await this.getAPI(this.searchTable)
+    },
+    async getAPI (query = '', date = '', session = '') {
+      this.loadingTableAPI = true
+      const url = 'table?query=' + query + '&date=' + date + '&session=' + session
+      await this.$axios.$get(url).then((res) => {
         this.tables = res.data
+      }).finally(() => {
+        this.loadingTableAPI = false
       })
     }
   }

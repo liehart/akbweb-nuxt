@@ -11,23 +11,38 @@
       <div class="flex w-full relative">
         <input
           ref="search"
-          v-model="search"
+          v-model="filter.search"
           type="text"
           name="search"
-          class="w-full border rounded-lg px-3 py-2 text-sm w-full focus:ring-2
-              focus:ring-blue-600 focus:outline-none"
+          class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
           placeholder="Cari No Meja"
           @input="isTyping = true"
+        >
+      </div>
+      <div class="px-2">
+        <input
+          v-model="filter.date"
+          type="date"
+          name="date"
+          placeholder="Tanggal"
+          :min="new Date().toISOString()"
+          class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
+          @change="searchAPI()"
         >
       </div>
       <NuxtLink
         v-if="$auth.hasScope('table.create')"
         to="/dashboard/meja/create"
-        class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
+        class="inline-flex items-center px-2 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
             focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap"
       >
-        Tambah Meja
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+        </svg>
+        <span class="pl-2">
+          Tambah Meja
+        </span>
       </NuxtLink>
     </div>
     <div
@@ -117,6 +132,7 @@
 
 <script>
 import _ from 'lodash'
+import moment from 'moment'
 
 export default {
   middleware: 'table/read',
@@ -126,15 +142,17 @@ export default {
       search: '',
       loading: true,
       loadingAPI: true,
-      tables: []
+      tables: [],
+      filter: {
+        search: '',
+        date: moment().format('YYYY-MM-DD'),
+        session: ''
+      }
     }
   },
   async fetch () {
-    await this.$axios.$get('table').then((res) => {
-      this.loading = false
-      this.loadingAPI = false
-      this.tables = res.data
-    })
+    await this.getAPI(this.filter.search, this.filter.date, this.filter.session)
+    this.loading = false
   },
   head () {
     return {
@@ -142,7 +160,7 @@ export default {
     }
   },
   watch: {
-    search: _.debounce(function () {
+    'filter.search': _.debounce(function () {
       this.isTyping = false
     }, 500),
     isTyping (state) {
@@ -159,7 +177,7 @@ export default {
       this.loadingAPI = true
       let url = 'table' + link
       if (this.search !== '') {
-        url = 'search/table?query=' + this.search + '&' + link.substring(1)
+        url = 'table?query=' + this.search + '&' + link.substring(1)
       }
       await this.$axios.$get(url).then((res) => {
         this.loadingAPI = false
@@ -167,10 +185,15 @@ export default {
       })
     },
     async searchAPI () {
+      await this.getAPI(this.filter.search, this.filter.date, this.filter.session)
+    },
+    async getAPI (query = '', date = '', session = '') {
       this.loadingAPI = true
-      await this.$axios.$get('search/table?query=' + this.search).then((res) => {
-        this.loadingAPI = false
+      const url = 'table?query=' + query + '&date=' + date + '&session=' + session
+      await this.$axios.$get(url).then((res) => {
         this.tables = res.data
+      }).finally(() => {
+        this.loadingAPI = false
       })
     }
   }

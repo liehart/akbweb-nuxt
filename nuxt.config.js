@@ -79,7 +79,8 @@ export default {
         'faPencilAlt',
         'faPowerOff',
         'faEllipsisV',
-        'faChevronDown'
+        'faChevronDown',
+        'faHistory'
       ]
     }
   },

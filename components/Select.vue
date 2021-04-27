@@ -37,7 +37,7 @@
           </span>
         </button>
       </span>
-      <div v-show="isOpen" class="fixed border border-gray-200 mt-1 rounded-md bg-white shadow-lg">
+      <div v-show="isOpen" class="fixed z-50 border border-gray-200 mt-1 rounded-md bg-white shadow-lg">
         <ul
           aria-activedescendant="listbox-item-0"
           aria-labelledby="listbox-label"

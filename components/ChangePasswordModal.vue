@@ -23,10 +23,8 @@
                 <h3 id="modal-title" class="text-lg leading-6 font-medium text-gray-900">
                   <slot name="title" />
                 </h3>
-                <div class="mt-2">
-                  <p class="text-sm text-gray-500">
-                    <slot name="body" />
-                  </p>
+                <div class="mt-2 text-sm text-gray-500">
+                  <slot name="body" />
                 </div>
               </div>
             </div>

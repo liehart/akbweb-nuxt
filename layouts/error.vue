@@ -11,6 +11,7 @@
             Telah terjadi error
           </span>
         </h1>
+        <p v-if="error.message" class="mt-2">{{ error.message }}</p>
         <div class="mt-5">
           <button
             class="text-white px-5 py-2.5 rounded-lg text-sm shadow-sm font-semibold text-center inline-block
@@ -33,6 +34,15 @@ export default {
     error: {
       type: Object,
       default: null
+    }
+  },
+  head () {
+    return {
+      title: (
+        this.error.statusCode === 404
+          ? 'Halaman Tidak Ditemukan'
+          : 'Telah Terjadi Error'
+      ) + ' | Atma Korean BBQ'
     }
   },
   methods: {

@@ -117,13 +117,25 @@ export default {
       }
     },
     async deleteCustomerAPI (data) {
-      await this.$axios.$delete('customer/' + data.id)
-      await this.$router.push('/dashboard/pelanggan')
-      this.$toast.show({
-        type: 'success',
-        title: 'Berhasil',
-        message: 'Data pelanggan ' + data.name + ' berhasil dihapus.',
-        timeout: 3
+      await this.$axios.$delete('customer/' + data.id).then(() => {
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data pelanggan ' + data.name + ' berhasil dihapus.',
+          timeout: 3
+        })
+        this.$router.push('/dashboard/pelanggan')
+      }).catch((err) => {
+        if (err.response) {
+          if (err.response.data.message) {
+            this.$toast.show({
+              type: 'danger',
+              title: 'Error',
+              message: err.response.data.message,
+              timeout: 3
+            })
+          }
+        }
       })
     }
   }
