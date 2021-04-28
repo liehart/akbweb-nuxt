@@ -8,18 +8,16 @@
       <p>Selamat datang di menu pengelolaan data meja</p>
     </div>
     <div class="mb-5 flex">
-      <div class="flex w-full relative">
+      <div class="grid-cols-6 grid gap-2">
         <input
           ref="search"
           v-model="filter.search"
           type="text"
           name="search"
-          class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
+          class="col-span-4 placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
           placeholder="Cari No Meja"
           @input="isTyping = true"
         >
-      </div>
-      <div class="px-2">
         <input
           v-model="filter.date"
           type="date"
@@ -29,21 +27,21 @@
           class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
           @change="searchAPI()"
         >
-      </div>
-      <NuxtLink
-        v-if="$auth.hasScope('table.create')"
-        to="/dashboard/meja/create"
-        class="inline-flex items-center px-2 py-2 border border-transparent rounded-md shadow-sm
+        <NuxtLink
+          v-if="$auth.hasScope('table.create')"
+          to="/dashboard/meja/create"
+          class="inline-flex items-center px-2 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
             focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-        </svg>
-        <span class="pl-2">
-          Tambah Meja
-        </span>
-      </NuxtLink>
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+          </svg>
+          <span class="pl-2">
+            Tambah Meja
+          </span>
+        </NuxtLink>
+      </div>
     </div>
     <div
       class="shadow bg-white overflow-hidden border-b border-gray-200 sm:rounded-lg"
@@ -59,8 +57,8 @@
       <div v-if="loading" class="text-center py-5 text-gray-500 text-sm">
         Loading...
       </div>
-      <div v-else-if="!loading && tables.data.length > 0" class="grid grid-cols-3 gap-4 p-5">
-        <div v-for="(data, key) in tables.data" :key="key">
+      <div v-else-if="!loading && tables.data.length > 0" class="grid grid-cols-4 gap-4 p-5">
+        <div v-for="(data, key) in tables.data" :key="key" @click="$router.push('meja/' + data.table_number)">
           <TableCard :data="data" />
         </div>
       </div>
@@ -147,7 +145,17 @@ export default {
         search: '',
         date: moment().format('YYYY-MM-DD'),
         session: ''
-      }
+      },
+      sessionList: [
+        {
+          name: 'Makan Siang',
+          value: 'lunch'
+        },
+        {
+          name: 'Makan Malam',
+          value: 'dinner'
+        }
+      ]
     }
   },
   async fetch () {
@@ -167,6 +175,9 @@ export default {
       if (!state) {
         this.searchAPI()
       }
+    },
+    'filter.session' () {
+      this.searchAPI()
     }
   },
   methods: {

@@ -1,25 +1,13 @@
 <template>
   <div>
-    <div class="mb-5">
-      <h1 class="text-4xl font-bold">
-        Data Reservasi
+    <div class="mb-5 flex justify-between items-center">
+      <h1 class="text-4xl font-medium tracking-normal">
+        Reservasi
       </h1>
-      <p>Selamat datang di menu pengelolaan data reservasi</p>
-    </div>
-    <div class="mb-5 flex">
-      <div class="flex w-full relative">
-        <input
-          ref="search"
-          type="text"
-          name="search"
-          class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
-          placeholder="Cari Reservasi"
-        >
-      </div>
       <NuxtLink
         v-if="$auth.hasScope('reservation.create')"
         to="/dashboard/reservasi/create"
-        class="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
+        class="h-full inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
             text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
             focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap justify-between flex"
       >
@@ -27,9 +15,43 @@
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
         </svg>
         <span class="pl-2">
-          Buat Reservasi
+          Reservasi
         </span>
       </NuxtLink>
+    </div>
+    <div class="mb-3 grid grid-cols-8 gap-2">
+      <div class="flex w-full relative col-span-6">
+        <input
+          v-model="filter.search"
+          ref="search"
+          type="text"
+          name="search"
+          class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
+          placeholder="Cari nama pelanggan"
+          @input="isTyping = true"
+        >
+      </div>
+      <div class="col-span-2">
+        <t-datepicker v-model="filter.date" placeholder="Pilih range tanggal" range />
+      </div>
+    </div>
+    <div class="mb-3 flex gap-5">
+      <div class="my-auto col-span-2 flex gap-2">
+        <div class="text-sm my-auto font-medium text-gray-500">
+          Hide past reservation:
+        </div>
+        <t-toggle v-model="filter.hide" />
+      </div>
+      <div class="my-auto col-span-2 flex gap-2">
+        <div class="text-sm my-auto font-medium text-gray-500 flex">
+          <div>
+            Filter:
+          </div>
+          <div class="flex ml-2">
+            <t-checkbox-group v-model="filter.status" :options="filterCheck"></t-checkbox-group>
+          </div>
+        </div>
+      </div>
     </div>
     <div
       class="shadow bg-white overflow-hidden border-b border-gray-200 sm:rounded-lg"
@@ -45,17 +67,14 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th scope="col" class="w-1/12 text-center px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Meja
+            </th>
+            <th scope="col" class="w-1/4 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Tanggal
             </th>
             <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Status
-            </th>
-            <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Sesi
-            </th>
-            <th scope="col" class="w-1/6 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nomor Meja
             </th>
             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Nama Pelanggan
@@ -74,54 +93,69 @@
         </tbody>
         <tbody v-else-if="!loading && reservations.data.length > 0" class="bg-white divide-y divide-gray-200">
           <tr v-for="reservation in reservations.data" :key="reservation.id">
-            <td class="px-4 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">
-                {{ reservation.date }}
-              </div>
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">
-                <span v-if="reservation.status === 'new'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                  New
-                </span>
-                <span v-else-if="reservation.status === 'in'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                  In Seat
-                </span>
-                <span v-else-if="reservation.status === 'done'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                  Done
-                </span>
-                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                  Cancelled
-                </span>
-              </div>
-            </td>
-            <td class="px-4 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">
-                <span v-if="reservation.session === 'lunch'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                  Lunch
-                </span>
-                <span v-else-if="reservation.session === 'dinner'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                  Dinner
-                </span>
-                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                  Tanpa Reservasi
-                </span>
-              </div>
-            </td>
             <td class="px-4 py-4">
-              <div class="text-sm text-gray-500 flex gap-1">
-                <div class="my-auto">
-                  {{ reservation.table_number }}
+              <div class="text-sm text-gray-500 flex m-auto">
+                <div class="flex m-auto">
+                  <div>
+                    {{ reservation.table_number }}
+                  </div>
+                  <div v-if="!reservation.table && reservation.status === 'new'" class="has-tooltip my-auto text-red-500 cursor-pointer ml-1">
+                    <span class="tooltip text-xs text-gray-500 bg-white rounded border border-gray-200 shadow-lg ml-7 px-2 p-1 -mt-3.5">
+                      <span class="font-bold">Meja telah dihapus</span>
+                      <br>
+                      Ganti meja untuk melanjutkan reservasi
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
                 </div>
-                <div v-if="!reservation.table" class="has-tooltip my-auto text-red-500 cursor-pointer">
-                  <span class="tooltip text-xs text-gray-500 bg-white rounded border border-gray-200 shadow-lg px-2 p-1 ml-6 -mt-3.5">
-                    <span class="font-bold">Meja telah dihapus</span>
-                    <br>
-                    Ganti meja untuk melanjutkan reservasi
-                  </span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                  </svg>
+              </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-500 font-medium flex gap-2">
+                {{ format_date(reservation.date) }}
+                <div class="text-sm text-gray-500 my-auto">
+                  <div v-if="reservation.session === 'lunch'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-yellow-100 text-yellow-800">
+                    <div class="my-auto mr-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      Lunch
+                    </div>
+                  </div>
+                  <div v-else-if="reservation.session === 'dinner'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-blue-100 text-blue-800">
+                    <div class="my-auto mr-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                      </svg>
+                    </div>
+                    <div>
+                      Dinner
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-500 font-medium">
+                <div v-if="reservation.status === 'new'" class="flex gap-2 text-green-500">
+                  <div class="h-2 w-2 bg-green-500 rounded-full my-auto" />
+                  New
+                </div>
+                <div v-else-if="reservation.status === 'in'" class="flex gap-2 text-yellow-500">
+                  <div class="h-2 w-2 bg-yellow-500 rounded-full my-auto" />
+                  On Seat
+                </div>
+                <div v-else-if="reservation.status === 'done'" class="flex gap-2 text-blue-500">
+                  <div class="h-2 w-2 bg-blue-500 rounded-full my-auto" />
+                  Finished
+                </div>
+                <div v-else class="flex gap-2">
+                  <div class="h-2 w-2 bg-gray-500 rounded-full my-auto" />
+                  Cancelled
                 </div>
               </div>
             </td>
@@ -217,20 +251,76 @@
 </template>
 
 <script>
+import moment from 'moment'
+import _ from 'lodash'
+
+moment.locale('id')
+
 export default {
   middleware: 'reservation/read',
   data () {
     return {
       loading: true,
       loadingAPI: true,
-      reservations: []
+      reservations: [],
+      isTyping: false,
+      filter: {
+        date: [],
+        from: '',
+        to: '',
+        hide: true,
+        status: ['in', 'new'],
+        search: ''
+      },
+      filterCheck: [
+        {
+          value: 'new',
+          text: 'New'
+        },
+        {
+          value: 'in',
+          text: 'On Seat'
+        },
+        {
+          value: 'done',
+          text: 'Selesai'
+        },
+        {
+          value: 'cancelled',
+          text: 'Batal'
+        }
+      ]
+    }
+  },
+  watch: {
+    'filter.search': _.debounce(function () {
+      this.isTyping = false
+    }, 500),
+    isTyping (state) {
+      if (!state) {
+        this.fetchData()
+      }
+    },
+    'filter.hide' () {
+      this.fetchData()
+    },
+    'filter.status' () {
+      this.fetchData()
+    },
+    'filter.date' () {
+      this.filter.from = this.filter.date[0]
+      this.filter.to = this.filter.date[1]
+      this.fetchData()
     }
   },
   async fetch () {
-    await this.$axios.$get('reservation').then((res) => {
+    await this.$axios.post(
+      'search/reservation', this.filter
+    ).then((res) => {
+      console.log(res)
       this.loading = false
       this.loadingAPI = false
-      this.reservations = res.data
+      this.reservations = res.data.data
     })
   },
   head () {
@@ -239,6 +329,22 @@ export default {
     }
   },
   methods: {
+    fetchData () {
+      this.loading = true
+      this.loadingAPI = true
+      this.$axios.post(
+        'search/reservation', this.filter
+      ).then((res) => {
+        this.loading = false
+        this.loadingAPI = false
+        this.reservations = res.data.data
+      })
+    },
+    format_date (value) {
+      if (value) {
+        return moment(String(value)).format('LL')
+      }
+    },
     showDetail (data) {
       this.$router.push('/dashboard/reservasi/' + data.id)
     },

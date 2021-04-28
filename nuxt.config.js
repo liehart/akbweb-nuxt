@@ -45,6 +45,9 @@ export default {
     },
     {
       src: '~/plugins/directives.js'
+    },
+    {
+      src: '~/plugins/tailwind.js'
     }
   ],
 

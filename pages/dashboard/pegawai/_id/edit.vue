@@ -128,6 +128,7 @@
                           Role Pegawai
                         </label>
                         <Select
+                          :disabled="form.locked"
                           v-model="form.role_id"
                           :error="(form.submitted && $v.form.role_id.$error)"
                           :list="roles.data"
@@ -350,7 +351,7 @@ export default {
         confirm_password: '',
         email: '',
         phone: '',
-        properties: {},
+        properties: [],
         image_path: '',
         image_delete: false
       },
@@ -383,6 +384,9 @@ export default {
       this.form = res.data.data
       this.title = res.data.data.name
       this.cropper.preview_url = res.data.data.image_path
+      this.form.properties = []
+      this.form.image_delete = false
+      this.form.image_change = false
     }).catch((err) => {
       return this.$nuxt.error({
         statusCode: err.statusCode,
@@ -426,12 +430,14 @@ export default {
       this.form.properties = {}
       this.form.image_path = null
       this.form.image_delete = true
+      this.form.image_change = true
     },
     cropImage () {
       this.form.image_delete = false
       this.form.properties = this.cropper.instance.getData(true)
       this.cropper.preview_url = this.cropper.instance.getCroppedCanvas().toDataURL('image/png')
       this.cropper.modal = false
+      this.form.image_change = true
     },
     showCropper () {
       if (!this.cropper.first_instance) {
@@ -453,6 +459,11 @@ export default {
       this.$router.push('/dashboard/pegawai/' + this.$route.params.id)
     },
     createEmployeeAPI () {
+      if (!this.form.image_change) {
+        this.form.properties = []
+        this.form.image_delete = false
+        this.form.image_path = ''
+      }
       this.$axios.put('employee/' + this.form.id, this.form).then((res) => {
         this.back()
         this.$toast.show({
