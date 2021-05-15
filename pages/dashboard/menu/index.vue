@@ -19,6 +19,7 @@
         </span>
       </NuxtLink>
     </div>
+    {{ filter }}
     <DataTable
       v-model="filter"
       :loading="loading"
@@ -72,8 +73,24 @@
             Ada
           </div>
           <div v-else class="flex gap-2 text-gray-500">
-            <div class="h-2 w-2 bg-gray-500 rounded-full my-auto" />
-            Kosong
+            <div class="flex items-center gap-2">
+              <div class="flex gap-2 items-center">
+                <div class="h-2 w-2 bg-gray-500 rounded-full my-auto" />
+                <div>
+                  Kosong
+                </div>
+              </div>
+              <div v-if="!item.ingredient" class="relative has-tooltip my-auto text-red-500 cursor-pointer">
+                <span class="absolute left-0 tooltip text-xs text-gray-500 bg-white rounded border border-gray-200 shadow-lg ml-7 px-2 p-1 -mt-3.5">
+                  <span class="font-bold">Menu tidak memiliki bahan</span>
+                  <br>
+                  Harap mengisi data bahan untuk menu ini.
+                </span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </template>
@@ -87,7 +104,33 @@
           </span>
         </div>
       </template>
+      <template #actions="{ item }">
+        <div class="text-sm text-gray-500 flex gap-2">
+          <div class="hover:opacity-70 cursor-pointer text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+              <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div
+            class="hover:opacity-70 cursor-pointer text-gray-400"
+            @click="setModal(item)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </template>
     </DataTable>
+    <Modal v-model="modal.state" class="z-50" @click="deleteAPI">
+      <template #title>
+        Hapus Menu
+      </template>
+      <template #body>
+        Apakah anda yakin akan menghapus menu <span class="font-bold">{{ modal.data.name }}</span>?
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -99,6 +142,10 @@ export default {
   middleware: 'menu/read',
   data () {
     return {
+      modal: {
+        state: false,
+        data: []
+      },
       searchFocus: false,
       isTyping: false,
       search: '',
@@ -169,6 +216,12 @@ export default {
           name: 'Harga',
           value: 'price',
           width: '1/12'
+        },
+        {
+          name: 'Actions',
+          value: 'actions',
+          width: '1/12',
+          sort: false
         }
       ]
     }
@@ -194,6 +247,10 @@ export default {
     }
   },
   methods: {
+    setModal (item) {
+      this.modal.state = true
+      this.modal.data = item
+    },
     formatPrice (data) {
       return data.toLocaleString('id-ID', {
         style: 'currency',
@@ -202,12 +259,39 @@ export default {
         maximumFractionDigits: 0
       })
     },
+    async deleteAPI () {
+      await this.$axios.$delete(`menu/${this.modal.data.id}`).then(() => {
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data menu ' + this.modal.data.name + ' berhasil dihapus.',
+          timeout: 3
+        })
+        this.modal.data = []
+        this.getAPI()
+      }).catch((e) => {
+        this.$toast.show({
+          type: 'danger',
+          title: 'Error',
+          message: e.response.data.message || e.response.data || e.message || e,
+          timeout: 3
+        })
+      })
+    },
     async getAPI () {
       this.loadingAPI = true
       const query = queryString.stringify({ v: JSON.stringify(this.filter) })
       await this.$axios.$get(`menu?${query}`).then((res) => {
-        this.loadingAPI = false
         this.menus = res.data
+      }).catch((e) => {
+        this.$toast.show({
+          type: 'danger',
+          title: 'Error',
+          message: e.response.data.message || e.response.data || e.message || e,
+          timeout: 3
+        })
+      }).finally(() => {
+        this.loadingAPI = false
       })
     },
     showDetail (data) {
@@ -216,3 +300,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.tooltip {
+  @apply invisible absolute
+}
+
+.has-tooltip:hover .tooltip {
+  @apply visible z-50
+}
+</style>

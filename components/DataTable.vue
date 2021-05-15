@@ -54,9 +54,9 @@
               v-for="(v, k) in headers"
               :key="k"
               scope="col"
-              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:opacity-70 cursor-pointer"
-              :class="`w-${v.width}`"
-              @click="changeSort(v.value)"
+              class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              :class="[(v.sort === false) ? '' : 'hover:opacity-70 cursor-pointer'] + ` w-${v.width}`"
+              @click="(v.sort === false) ? null : changeSort(v.value)"
             >
               <div class="flex items-center gap-2">
                 <div class="truncate select-none">
@@ -93,7 +93,7 @@
               :ref="v.value"
               class="px-4 py-4 whitespace-nowrap"
             >
-              <div class="text-sm text-gray-500">
+              <div class="text-sm text-gray-500" :class="v.align">
                 <slot :name="v.value" :item="menu">
                   {{ menu[v.value] }}
                 </slot>
@@ -217,20 +217,23 @@ export default {
       ]
     }
   },
+  watch: {
+    filter: {
+      deep: true,
+      handler () {
+        this.$emit('input', this.filter)
+      }
+    }
+  },
   methods: {
-    emit () {
-      this.$emit('input', this.filter)
-    },
     change () {
       this.filter.filter = this.filterOut.filtersName.map(function (x, i) {
         return { name: x, value: this.filterOut.filters[i] || [] }
       }.bind(this))
       this.filter.page = 1
-      this.emit()
     },
     changePage (page) {
       this.filter.page = page.replace(/\D/g, '')
-      this.emit()
     },
     changeSort (sort) {
       this.filter.page = 1
@@ -240,7 +243,6 @@ export default {
         this.filter.sort = sort
         this.filter.asc = true
       }
-      this.emit()
     }
   }
 }

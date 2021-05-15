@@ -22,6 +22,7 @@
         @focus="onFocus = true"
         @blur="checkBlur"
         @keyup.esc="checkBlur"
+        @keydown.enter="checkBlur"
       >
       <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
         <div v-if="query.length > 0 && onFocus" class="transition duration-200 cursor-pointer hover:opacity-70" @click="clear">
