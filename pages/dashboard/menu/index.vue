@@ -19,7 +19,6 @@
         </span>
       </NuxtLink>
     </div>
-    {{ filter }}
     <DataTable
       v-model="filter"
       :loading="loading"

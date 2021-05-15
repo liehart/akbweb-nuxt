@@ -95,7 +95,7 @@
             >
               <div class="text-sm text-gray-500" :class="v.align">
                 <slot :name="v.value" :item="menu">
-                  {{ menu[v.value] }}
+                  {{ lo.get(menu, v.value) }}
                 </slot>
               </div>
             </td>
@@ -171,6 +171,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 export default {
   name: 'DataTable',
   props: {
@@ -214,7 +215,8 @@ export default {
         25,
         50,
         100
-      ]
+      ],
+      lo: _
     }
   },
   watch: {

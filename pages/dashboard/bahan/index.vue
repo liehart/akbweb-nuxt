@@ -1,446 +1,249 @@
 <template>
   <div>
-    <div v-if="loading">
-      Loading
+    <div class="mb-5 flex justify-between items-center">
+      <h1 class="text-4xl font-medium tracking-normal">
+        Bahan
+      </h1>
+      <NuxtLink
+        v-if="$auth.hasScope('menu.create')"
+        to="/dashboard/reservasi/create"
+        class="h-full inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
+            text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none
+            focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap justify-between flex"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+        </svg>
+        <span class="pl-2">
+          Menu
+        </span>
+      </NuxtLink>
     </div>
-<!--    <div v-else>-->
-<!--      <div class="mb-5 flex justify-between items-center">-->
-<!--        <h1 class="text-4xl font-medium tracking-normal">-->
-<!--          Ingredient-->
-<!--        </h1>-->
-<!--        <NuxtLink-->
-<!--          v-if="$auth.hasScope('ingredient.create')"-->
-<!--          to="/dashboard/ingredient/create"-->
-<!--          class="h-full inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm-->
-<!--            text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none-->
-<!--            focus:ring-2 focus:ring-offset-2 focus:ring-red-500 whitespace-nowrap justify-between flex"-->
-<!--        >-->
-<!--          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">-->
-<!--            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />-->
-<!--          </svg>-->
-<!--          <span class="pl-2">-->
-<!--            Ingredient-->
-<!--          </span>-->
-<!--        </NuxtLink>-->
-<!--      </div>-->
-<!--      <div class="mb-5 flex justify-between">-->
-<!--        <transition name="bounce">-->
-<!--          <div-->
-<!--            class="relative rounded-md shadow-sm"-->
-<!--          >-->
-<!--            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">-->
-<!--              <span class="text-gray-500 sm:text-sm">-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">-->
-<!--                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />-->
-<!--                </svg>-->
-<!--              </span>-->
-<!--            </div>-->
-<!--            <input-->
-<!--              id="search"-->
-<!--              v-model="searchFilter.query"-->
-<!--              type="text"-->
-<!--              name="search"-->
-<!--              class="searchBox focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-12 sm:text-sm border-gray-300 rounded-md"-->
-<!--              :class="{ 'searchBox-grow' : searchFocus }"-->
-<!--              placeholder="Cari nama ingredient"-->
-<!--              @focus="searchFocus = true"-->
-<!--              @blur="searchFocus = false"-->
-<!--              @input="isTyping = true"-->
-<!--            >-->
-<!--          </div>-->
-<!--        </transition>-->
-<!--        <div class="flex items-center gap-2 text-sm text-gray-700">-->
-<!--          <t-rich-select-->
-<!--            v-model="searchFilter.category"-->
-<!--            multiple-->
-<!--            :close-on-select="false"-->
-<!--            :options="categoryFilterList"-->
-<!--            value-attribute="value"-->
-<!--            text-attribute="name"-->
-<!--            placeholder="Pilih kategori ingredient"-->
-<!--            hide-search-box-->
-<!--          />-->
-<!--          <div class="flex items-center gap-2">-->
-<!--            <div>-->
-<!--              Results per page-->
-<!--            </div>-->
-<!--            <t-rich-select-->
-<!--              v-model="searchFilter.show"-->
-<!--              :options="perPageViewFilterList"-->
-<!--              hide-search-box-->
-<!--            />-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div-->
-<!--        class="shadow bg-white overflow-hidden border-b border-gray-200 sm:rounded-lg"-->
-<!--      >-->
-<!--        <div-->
-<!--          class="h-1"-->
-<!--          :class="[ loading ? 'bg-indigo-200' : 'bg-gray-50' ]"-->
-<!--        >-->
-<!--          <div v-if="loading">-->
-<!--            <LoadingBar />-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <table class="min-w-full divide-y divide-gray-200">-->
-<!--          <thead class="bg-gray-50">-->
-<!--            <tr>-->
-<!--              <th scope="col" class="w-1/2 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">-->
-<!--                <div class="flex items-center gap-2 cursor-pointer select-none transition duration-200 hover:opacity-70" @click="changeSort('name')">-->
-<!--                  <div>-->
-<!--                    Nama-->
-<!--                  </div>-->
-<!--                  <div v-if="searchFilter.sort === 'name'">-->
-<!--                    <div v-if="searchFilter.asc">-->
-<!--                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
-<!--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />-->
-<!--                      </svg>-->
-<!--                    </div>-->
-<!--                    <div v-else>-->
-<!--                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
-<!--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />-->
-<!--                      </svg>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </th>-->
-<!--              <th scope="col" class="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">-->
-<!--                Satuan-->
-<!--              </th>-->
-<!--              <th scope="col" class="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">-->
-<!--                Jenis Ingredient-->
-<!--              </th>-->
-<!--              <th scope="col" class="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">-->
-<!--                <div class="flex items-center gap-2 cursor-pointer select-none transition duration-200 hover:opacity-70" @click="changeSort('is_available')">-->
-<!--                  <div>-->
-<!--                    Tersedia-->
-<!--                  </div>-->
-<!--                  <div v-if="searchFilter.sort === 'is_available'">-->
-<!--                    <div v-if="searchFilter.asc">-->
-<!--                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
-<!--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />-->
-<!--                      </svg>-->
-<!--                    </div>-->
-<!--                    <div v-else>-->
-<!--                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
-<!--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />-->
-<!--                      </svg>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </th>-->
-<!--              <th scope="col" class="w-1/12 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">-->
-<!--                <div class="flex items-center gap-2 cursor-pointer select-none transition duration-200 hover:opacity-70" @click="changeSort('price')">-->
-<!--                  <div>-->
-<!--                    Harga-->
-<!--                  </div>-->
-<!--                  <div v-if="searchFilter.sort === 'price'">-->
-<!--                    <div v-if="searchFilter.asc">-->
-<!--                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
-<!--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />-->
-<!--                      </svg>-->
-<!--                    </div>-->
-<!--                    <div v-else>-->
-<!--                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
-<!--                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />-->
-<!--                      </svg>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </th>-->
-<!--              <th scope="col" class="relative px-4 py-3">-->
-<!--                <span class="sr-only">Edit</span>-->
-<!--              </th>-->
-<!--            </tr>-->
-<!--          </thead>-->
-<!--          <tbody v-if="ingredients.data.length > 0" class="bg-white divide-y divide-gray-200">-->
-<!--            <tr v-for="ingredient in ingredients.data" :key="ingredient.id">-->
-<!--              <td class="px-4 py-4 whitespace-normal">-->
-<!--                <div class="flex items-start">-->
-<!--                  <div class="mr-4 flex-shrink-0">-->
-<!--                    <div v-if="ingredient.image_path">-->
-<!--                      <img class="h-20 w-20 rounded-md" :src="ingredient.image_path" :alt="`Ingredient image for ` + ingredient.name">-->
-<!--                    </div>-->
-<!--                    <div v-else>-->
-<!--                      <img class="h-20 w-20 rounded-md" src="https://atmakoreanbbq.s3-ap-southeast-1.amazonaws.com/public/no_image.png" :alt="`No ingredient image for ` + ingredient.name">-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                  <div>-->
-<!--                    <div class="text-sm text-gray-500">-->
-<!--                      <div class="font-medium">-->
-<!--                        {{ ingredient.name }}-->
-<!--                      </div>-->
-<!--                      <div class="text-sm text-gray-400">-->
-<!--                        {{ ingredient.description }}-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </td>-->
-<!--              <td class="px-4 py-4 whitespace-nowrap">-->
-<!--                <div class="text-sm text-gray-500">-->
-<!--                  {{ ingredient.unit }}-->
-<!--                </div>-->
-<!--              </td>-->
-<!--              <td class="px-4 py-4 whitespace-nowrap">-->
-<!--                <div class="text-sm text-gray-500">-->
-<!--                  <div v-if="ingredient.ingredient_type === 'main'" class="flex">-->
-<!--                    Utama-->
-<!--                  </div>-->
-<!--                  <div v-else-if="ingredient.ingredient_type === 'side_dish'" class="flex">-->
-<!--                    Side Dish-->
-<!--                  </div>-->
-<!--                  <div v-else-if="ingredient.ingredient_type === 'drink'" class="flex">-->
-<!--                    Minuman-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </td>-->
-<!--              <td class="px-4 py-4 whitespace-nowrap">-->
-<!--                <div class="text-sm text-gray-500 font-medium">-->
-<!--                  <div v-if="ingredient.is_available === 1" class="flex gap-2 text-green-500">-->
-<!--                    <div class="h-2 w-2 bg-green-500 rounded-full my-auto" />-->
-<!--                    Ada-->
-<!--                  </div>-->
-<!--                  <div v-else class="flex gap-2 text-gray-500">-->
-<!--                    <div class="h-2 w-2 bg-gray-500 rounded-full my-auto" />-->
-<!--                    Kosong-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </td>-->
-<!--              <td class="px-4 py-4 whitespace-nowrap">-->
-<!--                <div class="text-sm text-gray-500">-->
-<!--                  {{ formatPrice(ingredient.price) }}-->
-<!--                </div>-->
-<!--              </td>-->
-<!--              <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">-->
-<!--                <button-->
-<!--                  class="text-red-600 hover:text-red-900"-->
-<!--                  @click="showDetail(ingredient)"-->
-<!--                >-->
-<!--                  Detail-->
-<!--                </button>-->
-<!--              </td>-->
-<!--            </tr>-->
-<!--          </tbody>-->
-<!--          <tbody v-else class="bg-white divide-y divide-gray-200">-->
-<!--            <tr>-->
-<!--              <td colspan="6" class="text-center py-5 text-gray-500 text-sm">-->
-<!--                Tidak ada data-->
-<!--              </td>-->
-<!--            </tr>-->
-<!--          </tbody>-->
-<!--        </table>-->
-<!--        <div v-if="ingredients.data.length > 0" class="py-4 px-4 border-t flex justify-between">-->
-<!--          <div class="my-auto">-->
-<!--            <p class="text-sm text-gray-700">-->
-<!--              Menampilkan-->
-<!--              <span class="font-bold">{{ ingredients.from }}</span>-->
-<!--              ke-->
-<!--              <span class="font-bold">{{ ingredients.to }}</span>-->
-<!--              dari-->
-<!--              <span class="font-bold">{{ ingredients.total }}</span>-->
-<!--              hasil-->
-<!--            </p>-->
-<!--          </div>-->
-<!--          <div>-->
-<!--            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">-->
-<!--              <button-->
-<!--                class="relative inline-flex items-center px-2 py-2 rounded-l-md-->
-<!--              border border-gray-300 bg-white text-sm font-medium text-gray-500-->
-<!--              hover:bg-gray-50"-->
-<!--                :disabled="ingredients.prev_page_url === null"-->
-<!--                :class="[ ingredients.prev_page_url === null ? 'bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer' ]"-->
-<!--                @click="getAPIbyPage(ingredients.prev_page_url)"-->
-<!--              >-->
-<!--                <span class="sr-only">Previous</span>-->
-<!--                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">-->
-<!--                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />-->
-<!--                </svg>-->
-<!--              </button>-->
-<!--              <button-->
-<!--                v-for="(data, key) in ingredients.links.slice(1, -1)"-->
-<!--                :key="key"-->
-<!--                class="inline-flex relative items-center px-4 py-2 border-->
-<!--              border-gray-300 bg-white text-sm font-medium text-gray-500-->
-<!--              hover:bg-gray-50"-->
-<!--                :disabled="data.active || data.url === null"-->
-<!--                :class="[ data.active || data.url === null ? 'bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer']"-->
-<!--                @click="getAPIbyPage(data.url)"-->
-<!--              >-->
-<!--                <span-->
-<!--                  :class="{ 'font-bold text-gray-700' : data.active }"-->
-<!--                >{{ data.label }}</span>-->
-<!--              </button>-->
-<!--              <button-->
-<!--                class="relative inline-flex items-center px-2 py-2 rounded-r-md-->
-<!--              border border-gray-300 bg-white text-sm font-medium text-gray-500-->
-<!--              hover:bg-gray-100"-->
-<!--                :disabled="ingredients.next_page_url === null"-->
-<!--                :class="[ ingredients.next_page_url === null ? 'bg-gray-100 hover:bg-gray-100 cursor-default' : 'cursor-pointer' ]"-->
-<!--                @click="getAPIbyPage(ingredients.next_page_url)"-->
-<!--              >-->
-<!--                <span class="sr-only">Next</span>-->
-<!--                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">-->
-<!--                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />-->
-<!--                </svg>-->
-<!--              </button>-->
-<!--            </nav>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
+    <DataTable
+      v-model="filter"
+      :loading="loading"
+      :loading-a-p-i="loadingAPI"
+      :data="ingredients"
+      :headers="headers"
+      :filters="filters"
+    >
+      <template #serving_size="{ item }">
+        <div class="flex gap-1">
+          <div>
+            {{ item.serving_size }} {{ item.ingredients_unit }}
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+          <div>
+            1 {{ item.unit }}
+          </div>
+        </div>
+      </template>
+      <template #menu_type="{ item }">
+        <div class="text-sm text-gray-500">
+          <div v-if="item.menu_type === 'main'" class="flex">
+            Utama
+          </div>
+          <div v-else-if="item.menu_type === 'side_dish'" class="flex">
+            Side Dish
+          </div>
+          <div v-else-if="item.menu_type === 'drink'" class="flex">
+            Minuman
+          </div>
+        </div>
+      </template>
+      <template #remaining_stock="{ item }">
+        {{ item.remaining_stock.toLocaleString() }} {{ item.ingredients_unit }}
+        <span class="italic">
+          (~{{ Math.floor((item.remaining_stock/item.serving_size)).toLocaleString() }} {{ item.unit }})
+        </span>
+      </template>
+      <template #actions="{ item }">
+        <div class="text-sm text-gray-500 flex gap-2">
+          <div class="hover:opacity-70 cursor-pointer text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+              <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div
+            class="hover:opacity-70 cursor-pointer text-gray-400"
+            @click="setModal(item)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </template>
+    </DataTable>
+    <Modal v-model="modal.state" class="z-50" @click="deleteAPI">
+      <template #title>
+        Hapus Menu
+      </template>
+      <template #body>
+        Apakah anda yakin akan menghapus menu <span class="font-bold">{{ modal.data.name }}</span>?
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script>
-import _ from 'lodash'
-import { mapActions, mapState } from 'vuex'
-import { category, perPageView } from '~/const'
+import { category, perPageView } from '@/const'
+import queryString from 'query-string'
 
 export default {
-  middleware: 'ingredient/read',
-  async asyncData (context) {
-    await context.store.dispatch('api/fetchAPI', {
-      object: 'ingredient',
-      filter: {
-        page: 1,
-        reset: true
-      }
-    })
-  },
+  middleware: 'menu/read',
   data () {
     return {
-      searchFilter: {
-        show: 10,
-        query: '',
-        category: [],
-        sort: 'name',
-        asc: true,
-        page: 1,
-        reset: false
+      math: Math,
+      modal: {
+        state: false,
+        data: []
       },
-      categoryFilterList: category,
-      perPageViewFilterList: perPageView,
-      sortByFilterList: [
-        {
-          name: 'Nama',
-          value: 'name'
-        },
-        {
-          name: 'Harga',
-          value: 'price'
-        },
-        {
-          name: 'Baru saja dibuat',
-          value: 'created_at'
-        },
-        {
-          name: 'Baru saja diubah',
-          value: 'updated_at'
-        }
-      ],
       searchFocus: false,
       isTyping: false,
       search: '',
-      loadingAPI: true
+      loading: true,
+      loadingAPI: true,
+      ingredients: [],
+      categoryFilter: category,
+      perPageViewFilter: perPageView,
+      filter: {
+        sort: 'name'
+      },
+      filters: [
+        {
+          name: 'menu_type',
+          label: 'Kategori',
+          rules: [
+            {
+              name: 'Main Course',
+              value: 'main'
+            },
+            {
+              name: 'Side Dish',
+              value: 'side_dish'
+            },
+            {
+              name: 'Drink',
+              value: 'drink'
+            }
+          ]
+        }
+      ],
+      headers: [
+        {
+          name: 'Menu',
+          value: 'name',
+          width: '1/2'
+        },
+        {
+          name: 'Kategori',
+          value: 'menu_type',
+          width: '1/12'
+        },
+        {
+          name: 'Takaran Saji',
+          value: 'serving_size',
+          width: '1/12'
+        },
+        {
+          name: 'Stok',
+          value: 'remaining_stock',
+          width: '1/12'
+        },
+        {
+          name: 'Actions',
+          value: 'actions',
+          width: '1/12',
+          sort: false
+        }
+      ]
     }
+  },
+  async fetch () {
+    await this.getAPI().then(() => {
+      this.loading = false
+    })
   },
   head () {
     return {
-      title: 'Ingredient | Atma Korean BBQ'
+      title: 'Menu | Atma Korean BBQ  '
     }
   },
-  computed: {
-    ...mapState({
-      ingredients: state => state.api.data,
-      loading: state => state.api.loading
-    })
-  },
   watch: {
-    isTyping (state) {
-      if (!state) {
-        this.fetchAPI({
-          object: 'ingredient',
-          filter: this.searchFilter
-        })
+    filter: {
+      deep: true,
+      handler () {
+        if (!this.loadingAPI) {
+          this.getAPI()
+        }
       }
-    },
-    'searchFilter.query':
-      _.debounce(function () {
-        this.isTyping = false
-      }, 500),
-    'searchFilter.show' () {
-      this.fetchAPI({
-        object: 'ingredient',
-        filter: this.searchFilter
-      })
-    },
-    'searchFilter.category' () {
-      this.fetchAPI({
-        object: 'ingredient',
-        filter: this.searchFilter
-      })
-    },
-    'searchFilter.sort' () {
-      this.fetchAPI({
-        object: 'ingredient',
-        filter: this.searchFilter
-      })
-    },
-    'searchFilter.asc' () {
-      this.fetchAPI({
-        object: 'ingredient',
-        filter: this.searchFilter
-      })
     }
   },
   methods: {
-    ...mapActions({
-      fetchAPI: 'api/fetchAPI'
-    }),
-    getAPIbyPage (pageLink) {
-      const page = parseInt(pageLink.replace(/[^0-9]/g, ''), 10)
-      const filter = Object.assign({}, this.searchFilter)
-      filter.page = page
-      this.fetchAPI({
-        object: 'ingredient',
-        filter
-      })
-    },
-    changeSort (name) {
-      if (name !== this.searchFilter.sort) {
-        this.searchFilter.asc = true
-      } else {
-        this.searchFilter.asc = !this.searchFilter.asc
-      }
-      this.searchFilter.sort = name
+    setModal (item) {
+      this.modal.state = true
+      this.modal.data = item
     },
     formatPrice (data) {
-      const formatter = Intl.NumberFormat('id-ID', {
+      return data.toLocaleString('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       })
-      return formatter.format(data)
+    },
+    async deleteAPI () {
+      await this.$axios.$delete(`ingredient/${this.modal.data.id}`).then(() => {
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data menu ' + this.modal.data.name + ' berhasil dihapus.',
+          timeout: 3
+        })
+        this.modal.data = []
+        this.getAPI()
+      }).catch((e) => {
+        this.$toast.show({
+          type: 'danger',
+          title: 'Error',
+          message: e.response.data.message || e.response.data || e.message || e,
+          timeout: 3
+        })
+      })
+    },
+    async getAPI () {
+      this.loadingAPI = true
+      const query = queryString.stringify({ v: JSON.stringify(this.filter) })
+      await this.$axios.$get(`ingredient?${query}`).then((res) => {
+        this.ingredients = res.data
+      }).catch((e) => {
+        this.$toast.show({
+          type: 'danger',
+          title: 'Error',
+          message: e.response.data.message || e.response.data || e.message || e,
+          timeout: 3
+        })
+      }).finally(() => {
+        this.loadingAPI = false
+      })
     },
     showDetail (data) {
-      this.$router.push('/dashboard/ingredient/' + data.id)
+      this.$router.push('/dashboard/menu/' + data.id)
     }
   }
 }
 </script>
 
 <style scoped>
-.searchBox-grow {
-  @apply w-96;
-  @apply duration-200;
-  transition-property: width;
+.tooltip {
+  @apply invisible absolute
 }
 
-.searchBox {
-  @apply duration-200;
-  transition-property: width;
+.has-tooltip:hover .tooltip {
+  @apply visible z-50
 }
 </style>
