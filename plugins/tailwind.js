@@ -14,7 +14,7 @@ const settings = {
         selectButton: 'w-full flex text-left justify-between items-center cursor-pointer',
         selectButtonLabel: 'block truncate',
         selectButtonTagWrapper: 'flex flex-wrap overflow-hidden',
-        selectButtonTag: 'bg-blue-500 block disabled:cursor-not-allowed disabled:opacity-50 duration-100 ease-in-out rounded-md shadow-sm text-sm text-white transition white-space-no m-0.5 max-w-full overflow-hidden h-7 flex items-center focus:outline-none',
+        selectButtonTag: 'bg-blue-500 block disabled:cursor-not-allowed disabled:opacity-50 duration-100 ease-in-out rounded-md shadow-sm text-white transition white-space-no m-0.5 max-w-full overflow-hidden h-7 flex items-center focus:outline-none',
         selectButtonTagText: 'px-3',
         selectButtonTagDeleteButton: '-ml-1.5 h-full hover:bg-blue-600 hover:shadow-sm inline-flex items-center px-2 transition',
         selectButtonTagDeleteButtonIcon: 'w-3 h-3',
@@ -47,10 +47,10 @@ const settings = {
       classes: {
         wrapper: '',
         buttonWrapper: '',
-        selectButton: 'px-3 py-2 text-black transition duration-100 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none',
+        selectButton: 'px-3 py-2.5 text-black transition duration-100 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none',
         selectButtonLabel: '',
         selectButtonTagWrapper: '-mx-2 -my-2.5 py-1 pr-4',
-        selectButtonTag: 'bg-blue-500 block disabled:cursor-not-allowed disabled:opacity-50 duration-100 ease-in-out rounded-md shadow-sm text-sm text-white transition white-space-no m-0.5 max-w-full overflow-hidden h-7 flex items-center focus:outline-none',
+        selectButtonTag: 'bg-blue-500 block disabled:cursor-not-allowed disabled:opacity-50 duration-100 ease-in-out rounded-md shadow-sm text-white transition white-space-no m-0.5 max-w-full overflow-hidden h-7 flex items-center focus:outline-none',
         selectButtonTagText: 'px-3',
         selectButtonTagDeleteButton: '-ml-1.5 h-full hover:bg-blue-600 hover:shadow-sm inline-flex items-center px-2 transition',
         selectButtonTagDeleteButtonIcon: '',
@@ -82,20 +82,27 @@ const settings = {
       },
       variants: {
         danger: {
-          selectButton: 'border-red-300 bg-red-50 text-red-900',
+          selectButton: 'px-3 py-2.5 transition duration-100 ease-in-out bg-white border border-red-300 bg-red-50 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none',
           selectButtonPlaceholder: 'text-red-200',
           selectButtonIcon: 'text-red-500',
           selectButtonClearButton: 'hover:bg-red-200 text-red-500',
-          dropdown: 'bg-red-50 border-red-300'
+          dropdown: '-mt-1 bg-white border-b border-red-300 bg-red-50 border-l border-r rounded-b-md shadow-sm',
+          highlightedOption: 'mt-1 bg-red-100 rounded-md',
+          selectedOption: 'mt-1 font-semibold bg-gray-100 bg-red-500 rounded-md font-semibold text-white',
+          selectedHighlightedOption: 'mt-1 font-semibold bg-gray-100 bg-red-600 rounded-md font-semibold text-white'
         },
         simple: {
           selectedIcon: 'hidden'
         },
         success: {
-          selectButton: 'border-green-300 bg-green-50 text-green-900',
+          selectButton: 'px-3 py-2.5 transition duration-100 ease-in-out bg-white border border-green-300 bg-green-50 rounded-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none',
+          selectButtonPlaceholder: 'text-green-200',
           selectButtonIcon: 'text-green-500',
           selectButtonClearButton: 'hover:bg-green-200 text-green-500',
-          dropdown: 'bg-green-50 border-green-300'
+          dropdown: '-mt-1 bg-white border-b border-green-300 bg-green-50 border-l border-r rounded-b-md shadow-sm',
+          highlightedOption: 'mt-1 bg-green-100 rounded-md',
+          selectedOption: 'mt-1 font-semibold bg-gray-100 bg-green-500 rounded-md font-semibold text-white',
+          selectedHighlightedOption: 'mt-1 font-semibold bg-gray-100 bg-green-600 rounded-md font-semibold text-white'
         }
       }
     }
@@ -217,7 +224,7 @@ const settings = {
         inlineWrapper: '',
         inlineViews: 'rounded bg-white border mt-1 inline-flex',
         inputWrapper: '',
-        input: 'text-sm text-black placeholder-gray-300 border-gray-300',
+        input: 'text-sm text-black placeholder-gray-400 border-gray-300',
         clearButton: 'hover:bg-gray-100 rounded transition duration-100 ease-in-out text-gray-600',
         clearButtonIcon: '',
         viewGroup: '',

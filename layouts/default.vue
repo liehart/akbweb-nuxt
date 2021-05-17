@@ -17,42 +17,44 @@
         <div class="tracking-wider px-4 py-2 text-gray-300 text-sm font-bold">
           MENU
         </div>
-        <div id="dashboard">
-          <NuxtLink
-            to="/dashboard"
-            :class="{ 'active' : $route.name === 'dashboard' }"
-            class="transition duration-200 flex my-1 py-2 px-4
-          rounded cursor-pointer"
-          >
-            <div class="h-5 w-5 my-auto text-white hover:opacity-100">
-              <font-awesome-icon icon="home" class="h-5 w-5 my-auto" />
-            </div>
-            <div class="ml-2 my-auto text-sm text-white hover:opacity-100">
-              Dashboard
-            </div>
-          </NuxtLink>
-        </div>
         <div id="menu">
-          <NuxtLink
+          <div
             v-for="(data, key) in links"
-            v-show="$auth.hasScope(data.scope)"
+            v-show="$auth.hasScope(data.scope) || data.scope === '*'"
             :key="key"
-            :to="data.link"
-            class="transition duration-200 flex my-1 py-2 px-4
-          rounded cursor-pointer"
           >
-            <div class="h-5 w-5 my-auto text-white hover:opacity-100">
-              <font-awesome-icon :icon="data.icon" class="h-5 w-5 my-auto" />
+            <div
+              class="transition duration-200 flex my-1 py-2 px-4
+          rounded select-none"
+              :class="[active === data.link ? 'bg-white bg-opacity-30 cursor-pointer' : (!data.sub) ? 'hover:bg-white hover:bg-opacity-30 cursor-pointer' : '']"
+              @click="!data.sub ? goToPage(data) : null"
+            >
+              <div class="h-5 w-5 my-auto text-white hover:opacity-100">
+                <font-awesome-icon :icon="data.icon" class="h-5 w-5 my-auto" />
+              </div>
+              <div class="ml-2 my-auto text-sm text-white hover:opacity-100">
+                {{ data.name }}
+              </div>
             </div>
-            <div class="ml-2 my-auto text-sm text-white hover:opacity-100">
-              {{ data.name }}
+            <div v-if="data.sub">
+              <div
+                v-for="(f, k) in data.sub"
+                :key="k"
+                class="transition duration-200 my-1 pl-9 py-2 px-4 rounded cursor-pointer hover:bg-white hover:bg-opacity-30"
+                :class="[active === f.link ? 'bg-white bg-opacity-30 cursor-pointer' : 'hover:bg-black hover:bg-opacity-30 cursor-pointer']"
+                @click="goToPage(f)"
+              >
+                <div class="ml-2 my-auto text-sm text-white hover:opacity-100">
+                  {{ f.name }}
+                </div>
+              </div>
             </div>
-          </NuxtLink>
+          </div>
         </div>
       </div>
     </aside>
     <main class="w-full bg-gray-100">
-      <div class="z-50 flex py-5 px-10 bg-white border-b border-gray-200 shadow-md justify-between sticky top-0">
+      <div class="z-30 flex py-5 px-10 bg-white border-b border-gray-200 shadow-md justify-between sticky top-0">
         <div class="my-auto">
           <nav class="text-black" aria-label="Breadcrumb">
             <ol class="list-none p-0 inline-flex">
@@ -142,7 +144,14 @@ export default {
       isOpen: false,
       user: this.$auth.user.user,
       messages: [],
+      active: '/dashboard',
       links: [
+        {
+          icon: 'home',
+          link: '/dashboard',
+          name: 'Dashboard',
+          scope: '*'
+        },
         {
           icon: 'user-tag',
           link: '/dashboard/jabatan',
@@ -201,7 +210,19 @@ export default {
           icon: 'history',
           link: '/dashboard/stok',
           name: 'Stok',
-          scope: 'stock.read'
+          scope: 'stock.read',
+          sub: [
+            {
+              link: '/dashboard/stok/masuk',
+              name: 'Stok Masuk',
+              scope: 'stock.read'
+            },
+            {
+              link: '/dashboard/stok/keluar',
+              name: 'Stok Keluar',
+              scope: 'stock.read'
+            }
+          ]
         },
         {
           icon: 'print',
@@ -242,6 +263,10 @@ export default {
     pusher.disconnect()
   },
   methods: {
+    goToPage (data) {
+      this.active = data.link
+      this.$router.push(data.link)
+    },
     showToast (data) {
       this.$toast.show({
         title: data.title,
@@ -274,17 +299,5 @@ export default {
   url("~/assets/seoul.jpeg") no-repeat;
   background-size: cover;
   background-position: bottom;
-}
-
-#menu a.nuxt-link-active {
-  background: rgba(45, 55, 72, 0.5);
-}
-
-.active {
-  background: rgba(45, 55, 72, 0.5);
-}
-
-aside a:hover {
-  background: rgba(45, 55, 72, 0.5);
 }
 </style>

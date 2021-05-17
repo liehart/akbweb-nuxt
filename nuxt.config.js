@@ -94,7 +94,7 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
-    ['nuxt-tailvue', { all: true, toast: { defaults: { containerClasses: ['mt-20'] } } }]
+    ['nuxt-tailvue', { all: true, toast: { defaults: { containerClasses: ['mt-20', 'z-50'] } } }]
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

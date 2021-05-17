@@ -5,21 +5,31 @@
         <SearchBox v-model="filter.query" placeholder="Search by name" />
       </div>
       <div class="flex items-center gap-2 text-sm text-gray-700">
-        <div>
+        <div v-if="filters.length > 0">
           Filter
         </div>
         <div v-for="(f, k) in filters" :key="k">
-          <t-rich-select
-            v-model="filterOut.filters[k]"
-            multiple
-            :hide-search-box="true"
-            :close-on-select="false"
-            :options="f.rules"
-            value-attribute="value"
-            text-attribute="name"
-            :placeholder="`Pilih ${f.label}`"
-            @change="change"
-          />
+          <div v-if="f.type === 'date' || f.type === 'date.range'">
+            <div v-if="f.type === 'date'">
+              <t-datepicker v-model="filterOut.filters[k]" :placeholder="`Pilih ${f.label}`" @change="change"/>
+            </div>
+            <div v-else-if="f.type === 'date.range'">
+              <t-datepicker v-model="filterOut.filters[k]" :placeholder="`Pilih ${f.label}`" :range="true" @change="change"/>
+            </div>
+          </div>
+          <div v-else>
+            <t-rich-select
+              v-model="filterOut.filters[k]"
+              multiple
+              :hide-search-box="true"
+              :close-on-select="false"
+              :options="f.rules"
+              value-attribute="value"
+              text-attribute="name"
+              :placeholder="`Pilih ${f.label}`"
+              @change="change"
+            />
+          </div>
         </div>
         <div>
           Results per page
@@ -47,7 +57,7 @@
           <div class="loading-bar h-1 bg-blue-500" />
         </div>
       </div>
-      <table class="min-w-full divide-y divide-gray-200">
+      <table class="max-w-full w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
             <th
@@ -91,7 +101,8 @@
               v-for="(v, k) in headers"
               :key="k"
               :ref="v.value"
-              class="px-4 py-4 whitespace-nowrap"
+              class="px-4 py-4 whitespace-normal"
+              :class="`w-${v.width}`"
             >
               <div class="text-sm text-gray-500" :class="v.align">
                 <slot :name="v.value" :item="menu">
@@ -193,14 +204,15 @@ export default {
       default: null
     },
     filters: {
-      default: null
+      default: [],
+      required: false
     }
   },
   data () {
     return {
       filterOut: {
         filters: [],
-        filtersName: this.filters.map(({ name }) => name)
+        filtersName: this.filters ? this.filters.map(({ name }) => name) : []
       },
       filter: {
         query: '',
@@ -229,8 +241,8 @@ export default {
   },
   methods: {
     change () {
-      this.filter.filter = this.filterOut.filtersName.map(function (x, i) {
-        return { name: x, value: this.filterOut.filters[i] || [] }
+      this.filter.filter = this.filters.map(function (x, i) {
+        return { name: x.name, type: x.type ?? 'default', value: this.filterOut.filters[i] || [] }
       }.bind(this))
       this.filter.page = 1
     },
