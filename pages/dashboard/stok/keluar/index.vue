@@ -4,7 +4,7 @@
       <h1 class="text-4xl font-medium tracking-normal">
         Stok Keluar
       </h1>
-      <Button label="Catatan" variant="primary" :icon="true" @click="create">
+      <Button v-if="$auth.hasScope('stock.create')" label="Catatan" variant="primary" :icon="true" @click="create">
         <template #icon>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
@@ -78,6 +78,7 @@
       <template #actions="{ item }">
         <div class="text-sm text-gray-500 flex gap-2">
           <div
+            v-if="$auth.hasScope('stock.update')"
             class="hover:opacity-70 cursor-pointer text-gray-400"
             @click="edit(item)"
           >
@@ -87,6 +88,7 @@
             </svg>
           </div>
           <div
+            v-if="$auth.hasScope('stock.delete')"
             class="hover:opacity-70 cursor-pointer text-gray-400"
             @click="setModal(item)"
           >

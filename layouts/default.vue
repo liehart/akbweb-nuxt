@@ -26,8 +26,8 @@
             <div
               class="transition duration-200 flex my-1 py-2 px-4
           rounded select-none"
-              :class="[active === data.link ? 'bg-white bg-opacity-30 cursor-pointer' : (!data.sub) ? 'hover:bg-white hover:bg-opacity-30 cursor-pointer' : '']"
-              @click="!data.sub ? goToPage(data) : null"
+              :class="[active === data.link ? 'bg-white bg-opacity-30 cursor-pointer' : 'hover:bg-white hover:bg-opacity-30 cursor-pointer']"
+              @click="goToPage(data)"
             >
               <div class="h-5 w-5 my-auto text-white hover:opacity-100">
                 <font-awesome-icon :icon="data.icon" class="h-5 w-5 my-auto" />
