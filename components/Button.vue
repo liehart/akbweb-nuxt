@@ -58,10 +58,11 @@ export default {
 }
 .button {
   @apply transition duration-300 h-full inline-flex items-center px-4 py-2
-  rounded-md focus:outline-none gap-2 whitespace-nowrap justify-between flex
+  rounded-md focus:outline-none gap-2 whitespace-nowrap justify-center flex
 }
 .primary {
   @apply text-sm font-medium text-white bg-blue-600 hover:bg-blue-700
+  focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-blue-50
 }
 .secondary {
   @apply text-sm font-medium text-blue-600 bg-blue-100 hover:bg-blue-200

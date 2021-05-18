@@ -16,6 +16,7 @@
           v-model="query"
           :class="getVariant"
           name="unit"
+          :placeholder="placeholder"
           :readonly="readonly"
           :type="type"
         >
@@ -74,6 +75,10 @@ export default {
       type: String,
       default: 'text'
     },
+    placeholder: {
+      type: String,
+      default: ''
+    },
     readonly: {
       type: Boolean,
       default: false
@@ -107,14 +112,14 @@ export default {
 
 <style scoped>
 .success {
-  @apply transition duration-200 block w-full text-sm py-2.5 rounded-md border-green-300 bg-green-50 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-green-50
+  @apply transition placeholder-green-300 text-green-700 duration-200 block w-full text-sm py-2.5 rounded-md border-green-300 bg-green-50 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-green-50
 }
 
 .primary {
-  @apply transition duration-200 block w-full text-sm py-2.5 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-blue-50
+  @apply transition placeholder-gray-300 text-gray-700 duration-200 block w-full text-sm py-2.5 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-blue-50
 }
 
 .error {
-  @apply transition duration-200 block w-full text-sm py-2.5 rounded-md border-red-300 bg-red-50 shadow-sm focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50
+  @apply transition placeholder-red-300 text-red-700 duration-200 block w-full text-sm py-2.5 rounded-md border-red-300 bg-red-50 shadow-sm focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50
 }
 </style>

@@ -12,61 +12,62 @@
       <form class="bg-white shadow w-full rounded-lg" @submit.prevent="userLogin">
         <div class="px-5 py-7">
           <div class="mb-3">
-            <label class="font-semibold text-sm text-gray-600 pb-1 block">E-mail</label>
-            <input
-              ref="email"
+            <Input
               v-model="login.email"
+              label="Email Pegawai"
+              placeholder="user@atmakoreanbbq.me"
               type="text"
-              name="email"
-              class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
-              placeholder="user@atmakoreanbbq.com"
-              :class="{ 'border-red-600' : sumbitted && $v.login.email.$error }"
+              :variant="submitted ? ($v.login.email.$error ? 'error' : 'success') : 'primary'"
               @blur="$v.login.email.$touch()"
               @focus="$v.login.email.$touch()"
             >
-            <span v-if="sumbitted && !$v.login.email.required" class="text-xs text-red-500">
-              Email tidak boleh kosong
-            </span>
-            <span v-if="sumbitted && !$v.login.email.email" class="text-xs text-red-500">
-              Email tidak valid
-            </span>
+              <template #message>
+                <span v-if="submitted && !$v.login.email.required" class="text-xs text-red-500">
+                  Email tidak boleh kosong
+                </span>
+                <span v-if="submitted && !$v.login.email.email" class="text-xs text-red-500">
+                  Email tidak valid
+                </span>
+              </template>
+            </Input>
           </div>
           <div class="mb-3">
-            <label class="font-semibold text-sm text-gray-600 pb-1 block">Password</label>
-            <input
-              ref="password"
+            <Input
               v-model="login.password"
+              label="Password"
+              placeholder="Masukkan Password"
               type="password"
-              name="password"
-              class="placeholder-gray-300 flex-1 text-black block w-full rounded-md sm:text-sm border-gray-300"
-              placeholder="Masukkan password"
-              :class="{ 'border-red-600' : sumbitted && $v.login.password.$error }"
+              :variant="submitted ? ($v.login.password.$error ? 'error' : 'success') : 'primary'"
               @blur="$v.login.password.$touch()"
               @focus="$v.login.password.$touch()"
             >
-            <span v-if="sumbitted && !$v.login.password.required" class="text-xs text-red-500">
-              Password tidak boleh kosong
-            </span>
-            <span v-if="sumbitted && !$v.login.password.minLength" class="text-xs text-red-500">
-              Password minimal terdiri dari 8 karakter
-            </span>
-            <span v-if="sumbitted && !$v.login.password.maxLength" class="text-xs text-red-500">
-              Password maksimal terdiri dari 72 karakter
-            </span>
+              <template #message>
+                <span v-if="submitted && !$v.login.password.required" class="text-xs text-red-500">
+                  Password tidak boleh kosong
+                </span>
+                <span v-if="submitted && !$v.login.password.minLength" class="text-xs text-red-500">
+                  Password minimal terdiri dari 8 karakter
+                </span>
+                <span v-if="submitted && !$v.login.password.maxLength" class="text-xs text-red-500">
+                  Password maksimal terdiri dari 72 karakter
+                </span>
+              </template>
+            </Input>
           </div>
-          <button
-            class="text-white mt-3 w-full py-2.5 rounded-lg text-sm shadow-sm font-semibold text-center inline-block"
-            :class="[ loading ? 'bg-red-100' : 'hover:shadow-md bg-red-500 hover:bg-red-600 focus:bg-red-700  focus:shadow-sm focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 focus:outline-none' ]"
-            type="submit"
+          <Button
+            label="Masuk"
+            variant="primary"
             :disabled="loading"
+            :loading="loading"
+            :icon="true"
+            class="w-full mt-3"
           >
-            <span v-if="loading" class="inline-block mr-2">
-              Loading...
-            </span>
-            <span v-else>
-              Login
-            </span>
-          </button>
+            <template #icon>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </template>
+          </Button>
         </div>
         <div v-if="showError" class="bg-red-100 text-red-700 px-4 py-3 rounded-b">
           <p class="font-bold">
@@ -115,7 +116,7 @@ export default {
         }
       },
       loading: false,
-      sumbitted: false,
+      submitted: false,
       showError: false,
       errorMessage: '',
       errorTitle: ''
@@ -123,7 +124,7 @@ export default {
   },
   methods: {
     userLogin () {
-      this.sumbitted = true
+      this.submitted = true
       this.$v.$touch()
       if (!this.$v.$invalid) {
         this.setError(false, '', '')
