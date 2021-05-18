@@ -85,6 +85,7 @@ export default {
 }
 
 .searchBox {
+  @apply transition duration-200 block text-sm py-2.5 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-blue-50;
   @apply duration-200;
   transition-property: width;
 }

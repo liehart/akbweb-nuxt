@@ -22,7 +22,7 @@
       <template #remaining_stock="{ item }">
         <div class="flex gap-1">
           <div v-if="item.remaining_stock > 0">
-            {{ item.remaining_stock }} {{ item.unit }}
+            {{ item.remaining_stock.toLocaleString() }} {{ item.unit }}
           </div>
           <div v-else>
             Kosong

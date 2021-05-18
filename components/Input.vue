@@ -16,6 +16,7 @@
           v-model="query"
           :class="getVariant"
           name="unit"
+          :readonly="readonly"
           :type="type"
         >
         <div
@@ -72,6 +73,10 @@ export default {
     type: {
       type: String,
       default: 'text'
+    },
+    readonly: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

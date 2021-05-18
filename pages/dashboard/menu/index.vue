@@ -65,24 +65,35 @@
             Ada
           </div>
           <div v-else class="flex gap-2 text-gray-500">
-            <div class="flex items-center gap-2">
+            <div class="flex flex-col gap-2">
               <div class="flex gap-2 items-center">
                 <div class="h-2 w-2 bg-gray-500 rounded-full my-auto" />
                 <div>
                   Kosong
                 </div>
               </div>
-              <div v-if="!item.ingredient" class="relative has-tooltip my-auto text-red-500 cursor-pointer">
-                <span class="absolute left-0 tooltip text-xs text-gray-500 bg-white rounded border border-gray-200 shadow-lg ml-7 px-2 p-1 -mt-3.5">
-                  <span class="font-bold">Menu tidak memiliki bahan</span>
-                  <br>
-                  Harap mengisi data bahan untuk menu ini.
-                </span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-              </div>
             </div>
+          </div>
+        </div>
+      </template>
+      <template #stock="{ item }">
+        <div class="font-medium">
+          {{ item.ingredient.remaining_stock.toLocaleString() }} {{ item.ingredient.unit }}
+        </div>
+        <div v-if="item.serving_size" class="text-xs text-gray-400">
+          Sekitar {{ Math.floor((item.ingredient.remaining_stock/item.serving_size)).toLocaleString() }} {{ item.unit }}
+        </div>
+      </template>
+      <template #serving_size="{ item }">
+        <div class="flex gap-1">
+          <div>
+            {{ item.serving_size }} {{ item.ingredient.unit }}
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+          <div>
+            1 {{ item.unit }}
           </div>
         </div>
       </template>
@@ -98,6 +109,23 @@
       </template>
       <template #actions="{ item }">
         <div class="text-sm text-gray-500 flex gap-2">
+          <div
+            class="hover:opacity-70 cursor-pointer text-gray-400"
+            @click="refresh(item)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div
+            class="hover:opacity-70 cursor-pointer text-gray-400"
+            @click="show(item)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+              <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+            </svg>
+          </div>
           <div
             class="hover:opacity-70 cursor-pointer text-gray-400"
             @click="edit(item)"
@@ -317,17 +345,17 @@
                 <div class="flex gap-3 w-full items-center">
                   <div class="flex-shrink-0">
                     <div v-if="!loadingImage">
-                      <img class="h-16 w-16 rounded-md object-cover object-center" :src="form.image_path" />
+                      <img class="h-16 w-16 rounded-md object-cover object-center" :src="form.image_path">
                     </div>
                     <div v-else class="relative flex items-center justify-center h-16 w-16 bg-gray-300 rounded-md">
                       <div class="absolute">
                         <div class="sk-chase">
-                          <div class="sk-chase-dot"></div>
-                          <div class="sk-chase-dot"></div>
-                          <div class="sk-chase-dot"></div>
-                          <div class="sk-chase-dot"></div>
-                          <div class="sk-chase-dot"></div>
-                          <div class="sk-chase-dot"></div>
+                          <div class="sk-chase-dot" />
+                          <div class="sk-chase-dot" />
+                          <div class="sk-chase-dot" />
+                          <div class="sk-chase-dot" />
+                          <div class="sk-chase-dot" />
+                          <div class="sk-chase-dot" />
                         </div>
                       </div>
                     </div>
@@ -420,6 +448,7 @@ export default {
         description: '',
         menu_type: '',
         price: '',
+        image_path: null,
         ingredient: null,
         ingredient_id: null
       },
@@ -430,6 +459,7 @@ export default {
         description: '',
         menu_type: '',
         price: '',
+        image_path: null,
         ingredient_id: null
       },
       submitted: false,
@@ -493,12 +523,7 @@ export default {
         {
           name: 'Nama',
           value: 'name',
-          width: '1/2'
-        },
-        {
-          name: 'Satuan',
-          value: 'unit',
-          width: '1/12'
+          width: '1/3'
         },
         {
           name: 'Kategori',
@@ -508,6 +533,16 @@ export default {
         {
           name: 'Tersedia',
           value: 'is_available',
+          width: '1/12'
+        },
+        {
+          name: 'Serving Size',
+          value: 'serving_size',
+          width: '1/12'
+        },
+        {
+          name: 'Stock',
+          value: 'stock',
           width: '1/12'
         },
         {
@@ -709,6 +744,44 @@ export default {
         this.serving_size_unit = res.data.unit
       })
     },
+    async show (item) {
+      await this.$axios.$post(`menu/${item.id}/enable`).then(() => {
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data menu ' + item.name + ' berhasil diubah.',
+          timeout: 3
+        })
+        this.deleteModal.data = []
+        this.getAPI()
+      }).catch((e) => {
+        this.$toast.show({
+          type: 'danger',
+          title: 'Error',
+          message: e.response.data.message || e.response.data || e.message || e,
+          timeout: 3
+        })
+      })
+    },
+    async refresh (item) {
+      await this.$axios.$post(`menu/${item.id}/refresh`).then(() => {
+        this.$toast.show({
+          type: 'success',
+          title: 'Berhasil',
+          message: 'Data menu ' + item.name + ' berhasil direfresh.',
+          timeout: 3
+        })
+        this.deleteModal.data = []
+        this.getAPI()
+      }).catch((e) => {
+        this.$toast.show({
+          type: 'danger',
+          title: 'Error',
+          message: e.response.data.message || e.response.data || e.message || e,
+          timeout: 3
+        })
+      })
+    },
     create () {
       this.$v.$reset()
       this.submitted = false
@@ -718,6 +791,7 @@ export default {
       this.modal.loading = false
       this.modal.status = 'create'
       this.modal.title = 'Buat Menu Baru'
+      this.imageData.loaded = false
       this.getOptionsCount()
     },
     setModal (item) {
