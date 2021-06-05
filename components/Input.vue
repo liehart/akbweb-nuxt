@@ -5,6 +5,7 @@
     </label>
     <div class="transition duration-200 relative mt-1 flex-col">
       <div class="flex">
+        <slot name="prepend" />
         <div
           v-if="prepend"
           class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"

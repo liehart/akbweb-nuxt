@@ -2,10 +2,10 @@
   <transition name="ease" @after-enter="isOpen = true">
     <div
       v-show="value"
-      class="fixed inset-0 overflow-y-auto"
+      class="fixed inset-0 overflow-y-auto z-30"
       aria-labelledby="modal-title"
       role="dialog"
-      @click="!persistent ? closeModal : null"
+      @click="closeModalOnClick"
     >
       <div
         class="transition flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
@@ -36,7 +36,8 @@
             </div>
             <div class="bg-gray-50 border-t px-4 py-5 mt-5 sm:px-6 sm:flex sm:flex-row-reverse flex gap-5">
               <Button
-                label="Simpan"
+                v-if="!hideAction"
+                :label="actionLabel"
                 variant="primary"
                 :disabled="loading"
                 :loading="loading"
@@ -44,12 +45,17 @@
                 @click="confirmModal"
               >
                 <template #icon>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                  </svg>
+                  <div v-if="customIcon">
+                    <slot name="icon" />
+                  </div>
+                  <div v-else>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
                 </template>
               </Button>
-              <Button label="Batal" variant="secondary" :disabled="loading" @click="closeModal" />
+              <Button :label="closeLabel" variant="secondary" :disabled="loading" @click="closeModal" />
             </div>
           </div>
         </transition>
@@ -73,6 +79,22 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    closeLabel: {
+      type: String,
+      default: 'Batal'
+    },
+    actionLabel: {
+      type: String,
+      default: 'Simpan'
+    },
+    customIcon: {
+      type: Boolean,
+      default: false
+    },
+    hideAction: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -81,6 +103,11 @@ export default {
     }
   },
   methods: {
+    closeModalOnClick () {
+      if (!this.persistent) {
+        this.closeModal()
+      }
+    },
     closeModal () {
       this.isOpen = false
       this.$emit('input', false)

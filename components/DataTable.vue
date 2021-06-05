@@ -2,7 +2,7 @@
   <div>
     <div class="mb-5 flex justify-between">
       <div>
-        <SearchBox v-model="filter.query" placeholder="Search by name" />
+        <SearchBox v-model="filter.query" placeholder="Search by name and table" />
       </div>
       <div class="flex items-center gap-2 text-sm text-gray-700">
         <div v-if="filters.length > 0">

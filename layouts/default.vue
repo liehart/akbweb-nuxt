@@ -131,12 +131,12 @@
   </div>
 </template>
 <script>
-import Pusher from 'pusher-js'
-
-const pusher = new Pusher('48f1e0b5f3e9d848a375', {
-  cluster: 'ap1',
-  encrypted: false
-})
+// import Pusher from 'pusher-js'
+//
+// const pusher = new Pusher('48f1e0b5f3e9d848a375', {
+//   cluster: 'ap1',
+//   encrypted: false
+// })
 
 export default {
   data () {
@@ -227,7 +227,7 @@ export default {
         {
           icon: 'print',
           link: '/dashboard/laporan',
-          name: 'laporan',
+          name: 'Laporan',
           scope: 'report.read'
         }
       ]
@@ -252,15 +252,15 @@ export default {
     }
   },
   mounted () {
-    const channel = pusher.subscribe('customer-created')
-
-    channel.bind('customer-created', (data) => {
-      this.showToast(data)
-    })
+    // const channel = pusher.subscribe('customer-created')
+    // channel.bind('customer-created', (data) => {
+    //   console.log(data)
+    //   this.showToast(data)
+    // })
   },
   beforeDestroy () {
-    pusher.unsubscribe('customer-created')
-    pusher.disconnect()
+    // pusher.unsubscribe('customer-created')
+    // pusher.disconnect()
   },
   methods: {
     goToPage (data) {
@@ -272,8 +272,8 @@ export default {
         title: data.title,
         message: data.message,
         timeout: false,
-        primary: { label: 'Lihat', action: () => alert('primary') },
-        secondary: { label: 'Tutup', action: () => alert('secondary') }
+        primary: { label: 'Lihat', action: () => this.$router.push('/dashboard/pesanan/' + data.token) },
+        secondary: { label: 'Tutup', action: () => {} }
       })
     },
     logoutUser () {

@@ -3,7 +3,7 @@
     <div v-if="icon && !loading">
       <slot name="icon" />
     </div>
-    <div v-if="!loading">
+    <div v-if="!loading && label.length > 0">
       {{ label }}
     </div>
     <div v-if="loading">
@@ -21,7 +21,7 @@ export default {
   props: {
     label: {
       type: String,
-      required: true
+      default: ''
     },
     variant: {
       type: String,

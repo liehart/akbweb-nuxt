@@ -359,7 +359,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .loading-bar {
   animation: indeterminate 2800ms infinite linear
 }
