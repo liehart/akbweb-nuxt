@@ -71,9 +71,9 @@
       </template>
       <template #quantity="{ item }">
         {{ item.quantity.toLocaleString() }} {{ item.i_unit }}
-        <span class="italic">
-          (~{{ Math.floor((item.quantity/item.serving_size)).toLocaleString() }} {{ item.m_unit }})
-        </span>
+        <div v-if="item.serving_size" class="text-xs text-gray-400">
+          {{ item.quantity % item.serving_size !== 0 ? 'Sekitar' : '' }} {{ Math.floor((item.quantity/item.serving_size)).toLocaleString() }} {{ item.m_unit }}
+        </div>
       </template>
       <template #actions="{ item }">
         <div class="text-sm text-gray-500 flex gap-2">
@@ -242,7 +242,8 @@ export default {
       categoryFilter: category,
       perPageViewFilter: perPageView,
       filter: {
-        sort: 'date'
+        sort: 'date',
+        asc: false
       },
       filters: [
         {

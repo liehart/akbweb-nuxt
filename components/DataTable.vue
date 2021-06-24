@@ -2,7 +2,7 @@
   <div>
     <div class="mb-5 flex justify-between">
       <div>
-        <SearchBox v-model="filter.query" placeholder="Search by name and table" />
+        <SearchBox v-model="filter.query" placeholder="Search by name" />
       </div>
       <div class="flex items-center gap-2 text-sm text-gray-700">
         <div v-if="filters.length > 0">
@@ -74,13 +74,13 @@
                 </div>
                 <div v-if="filter.sort === v.value">
                   <div v-if="filter.asc">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
                     </svg>
                   </div>
                   <div v-else>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default {
   data () {
     return {
       filterOut: {
-        filters: [],
+        filters: this.filters ? this.filters.map(({ def }) => def) : [],
         filtersName: this.filters ? this.filters.map(({ name }) => name) : []
       },
       filter: {
@@ -238,6 +238,10 @@ export default {
         this.$emit('input', this.filter)
       }
     }
+  },
+  mounted () {
+    this.change()
+    this.$emit('input', this.filter)
   },
   methods: {
     change () {

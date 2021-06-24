@@ -61,7 +61,7 @@
           {{ item.quantity.toLocaleString() }} {{ item.i_unit }}
         </div>
         <div v-if="item.serving_size" class="text-xs text-gray-400">
-          Sekitar {{ Math.floor((item.quantity/item.serving_size)).toLocaleString() }} {{ item.m_unit }}
+          {{ item.quantity % item.serving_size !== 0 ? 'Sekitar' : '' }} {{ Math.floor((item.quantity/item.serving_size)).toLocaleString() }} {{ item.m_unit }}
         </div>
       </template>
       <template #price="{ item }">
@@ -257,7 +257,8 @@ export default {
       categoryFilter: category,
       perPageViewFilter: perPageView,
       filter: {
-        sort: 'date'
+        sort: 'date',
+        asc: false
       },
       filters: [
         {

@@ -10,19 +10,6 @@
         <div class="flex gap-5">
           <Button
             v-if="$auth.hasScope('ingredient.create')"
-            label="Hapus Pesanan"
-            variant="primary"
-            :icon="true"
-            @click="create"
-          >
-            <template #icon>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-            </template>
-          </Button>
-          <Button
-            v-if="$auth.hasScope('ingredient.create')"
             label="Kembali"
             variant="secondary"
             :icon="true"
@@ -39,10 +26,10 @@
     </div>
     <div class="flex gap-5">
       <div class="w-2/3 bg-white rounded-md p-5 h-full">
-        <div class="font-bold mb-3">
-          Detail Item Pesanan
-        </div>
-        <div>
+        <div v-if="customer.data.details.length > 0">
+          <div class="font-bold mb-3">
+            Detail Item Pesanan
+          </div>
           <div v-for="(value, key) in customer.data.details" :key="key" class="mb-5">
             <div class="font-medium mb-3">
               Pesanan #{{ key + 1 }}
@@ -152,16 +139,22 @@
                 <div class="text-xs text-gray-500">
                   Email Pelanggan
                 </div>
-                <div>
+                <div v-if="customer.data.reservation.customer.email">
                   {{ customer.data.reservation.customer.email }}
+                </div>
+                <div v-else>
+                  -
                 </div>
               </div>
               <div class="flex flex-col">
                 <div class="text-xs text-gray-500">
                   Nomor Telepon
                 </div>
-                <div>
+                <div v-if="customer.data.reservation.customer.phone">
                   {{ customer.data.reservation.customer.phone }}
+                </div>
+                <div v-else>
+                  -
                 </div>
               </div>
               <div class="flex flex-col">

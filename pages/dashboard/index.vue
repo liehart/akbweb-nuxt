@@ -14,7 +14,7 @@
       </div>
     </div>
     <div v-else>
-      <div class="mt-5 grid grid-cols-4 gap-6 text-center">
+      <div class="mt-5 grid grid-cols-4 gap-6">
         <div class="p-5 col-span-1 bg-white rounded-md shadow">
           <h2>Reservasi Hari Ini</h2>
           <div class="flex justify-center items-center gap-4">
@@ -36,6 +36,31 @@
               </svg>
             </div>
           </div>
+        </div>
+        <div class="p-5 col-span-1 bg-white rounded-md shadow">
+          <h2>Reservasi Hari Ini</h2>
+          <div class="flex justify-center items-center gap-4">
+            <div>
+              <p class="font-bold text-5xl text-gray-700">
+                {{ statistics.reservation.today }}
+              </p>
+            </div>
+            <div v-if="statistics.reservation.diff > 0" class="flex text-green-500">
+              {{ statistics.reservation.diff }}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 my-auto" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div v-else-if="statistics.reservation.diff < 0" class="flex text-red-500">
+              {{ statistics.reservation.diff }}
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 my-auto" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="p-5 col-span-1 bg-white rounded-md shadow">
+          <h2>Menu Terlaris Bulan Ini</h2>
         </div>
       </div>
     </div>

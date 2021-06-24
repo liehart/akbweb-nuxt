@@ -1,60 +1,64 @@
 <template>
   <div class="flex">
     <aside
-      class="relative h-screen flex flex-col flex-wrap bg-gray-900 flex-none w-64
-      animated faster shadow-md sticky top-0 bg-image-dashboard"
+      class="relative h-screen flex flex-col bg-gray-100 w-72 flex-shrink-0 sticky top-0 overflow-y-auto overflow-x-hidden gap-10"
     >
-      <div class="h-20 flex align-middle text-white px-3">
-        <img src="~/assets/logo.svg" class="w-16 my-auto">
-        <div class="my-auto">
-          <p class="font-bold">
-            Atma Korean BBQ
-          </p>
-          <p>Dashboard</p>
+      <div class="w-full mt-5 mx-5">
+        <div class="font-bold text-4xl text-blue-500">
+          Dashboard.
+        </div>
+        <div class="text-gray-700 font-medium">
+          Atma Korean BBQ
         </div>
       </div>
-      <div class="p-3">
-        <div class="tracking-wider px-4 py-2 text-gray-300 text-sm font-bold">
-          MENU
-        </div>
-        <div id="menu">
+      <div id="menu" class="w-full">
+        <div
+          v-for="(data, key) in links"
+          v-show="$auth.hasScope(data.scope) || data.scope === '*'"
+          :key="key"
+        >
           <div
-            v-for="(data, key) in links"
-            v-show="$auth.hasScope(data.scope) || data.scope === '*'"
-            :key="key"
+            class="transition duration-200 flex items-center justify-between my-1 px-5 py-3 select-none"
+            :class="[active === data.link ? 'text-blue-500 bg-gray-200 cursor-pointer' : 'text-gray-600 hover:bg-gray-200 cursor-pointer']"
+            @click="data.sub ? showDropdown(key) : goToPage(data)"
           >
-            <div
-              class="transition duration-200 flex my-1 py-2 px-4
-          rounded select-none"
-              :class="[active === data.link ? 'bg-white bg-opacity-30 cursor-pointer' : 'hover:bg-white hover:bg-opacity-30 cursor-pointer']"
-              @click="goToPage(data)"
-            >
-              <div class="h-5 w-5 my-auto text-white hover:opacity-100">
+            <div class="flex">
+              <div class="h-5 w-5 my-auto hover:opacity-100">
                 <font-awesome-icon :icon="data.icon" class="h-5 w-5 my-auto" />
               </div>
-              <div class="ml-2 my-auto text-sm text-white hover:opacity-100">
+              <div class="ml-2 my-auto text-sm hover:opacity-100">
                 {{ data.name }}
               </div>
             </div>
-            <div v-if="data.sub">
-              <div
-                v-for="(f, k) in data.sub"
-                :key="k"
-                class="transition duration-200 my-1 pl-9 py-2 px-4 rounded cursor-pointer hover:bg-white hover:bg-opacity-30"
-                :class="[active === f.link ? 'bg-white bg-opacity-30 cursor-pointer' : 'hover:bg-black hover:bg-opacity-30 cursor-pointer']"
-                @click="goToPage(f)"
-              >
-                <div class="ml-2 my-auto text-sm text-white hover:opacity-100">
-                  {{ f.name }}
-                </div>
+            <div v-if="data.sub && !data.show" class="text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <div v-else-if="data.sub && data.show" class="text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+          <div v-if="data.sub && data.show">
+            <div
+              v-for="(f, k) in data.sub"
+              :key="k"
+              class="transition duration-200 flex items-center justify-between my-1 px-10 py-3 select-none"
+              :class="[active === f.link ? 'text-blue-500 bg-gray-200 cursor-pointer' : 'text-gray-400 hover:bg-gray-200 cursor-pointer']"
+              @click="goToPage(f)"
+            >
+              <div class="ml-2 my-auto text-sm hover:opacity-100">
+                {{ f.name }}
               </div>
             </div>
           </div>
         </div>
       </div>
     </aside>
-    <main class="w-full bg-gray-100">
-      <div class="z-30 flex py-5 px-10 bg-white border-b border-gray-200 shadow-md justify-between sticky top-0">
+    <main class="w-full bg-gray-50">
+      <div class="z-30 flex py-5 px-10 bg-white border-b border-gray-200 justify-between sticky top-0">
         <div class="my-auto">
           <nav class="text-black" aria-label="Breadcrumb">
             <ol class="list-none p-0 inline-flex">
@@ -192,7 +196,20 @@ export default {
           icon: 'money-check-alt',
           link: '/dashboard/transaksi',
           name: 'Transaksi',
-          scope: 'transaction.read'
+          scope: 'transaction.read',
+          show: false,
+          sub: [
+            {
+              link: '/dashboard/stok/masuk',
+              name: 'Daftar Transaksi',
+              scope: 'stock.read'
+            },
+            {
+              link: '/dashboard/stok/keluar',
+              name: 'Kelola Data Kartu',
+              scope: 'stock.read'
+            }
+          ]
         },
         {
           icon: 'utensils',
@@ -208,9 +225,9 @@ export default {
         },
         {
           icon: 'history',
-          link: '/dashboard/stok',
           name: 'Stok',
           scope: 'stock.read',
+          show: false,
           sub: [
             {
               link: '/dashboard/stok/masuk',
@@ -285,19 +302,10 @@ export default {
     accountSetting () {
       this.$router.push('/dashboard/profil')
       this.isOpen = false
+    },
+    showDropdown (key) {
+      this.links[key].show = !this.links[key].show
     }
   }
 }
 </script>
-
-<style>
-.bg-image-dashboard {
-  background: linear-gradient(
-    rgba(0, 0, 0, 0.5),
-    rgba(0, 0, 0, 0.5)
-  ),
-  url("~/assets/seoul.jpeg") no-repeat;
-  background-size: cover;
-  background-position: bottom;
-}
-</style>

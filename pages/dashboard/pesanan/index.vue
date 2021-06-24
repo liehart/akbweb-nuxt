@@ -11,7 +11,7 @@
       </div>
       <Button
         v-if="$auth.hasScope('ingredient.create')"
-        label="Pesanan"
+        label="Terima Reservasi"
         variant="primary"
         :icon="true"
         @click="create"
@@ -38,44 +38,43 @@
       :loading-a-p-i="loadingAPI"
       :data="ingredients"
       :headers="headers"
+      :filters="filters"
     >
       <template #order_date="{ item }">
         {{ $moment(item.order_date).format('MMMM Do YYYY, HH:mm') }}
       </template>
-      <template #name="{ item }">
-        <div class="flex text-sm items-center gap-3">
-          <div
-            class="flex flex-row gap-3 items-center text-center text-white rounded-md p-2"
-            :class="[item.session === 'lunch' ? `bg-blue-500` : `bg-blue-700`]"
-          >
-            <div class="flex flex-col">
-              <div class="text-xs">
-                Meja
-              </div>
-              <div class="font-bold">
-                {{ item.table_number }}
-              </div>
+      <template #is_paid="{ item }">
+        <div v-if="item.is_paid === 1">
+          <span class="rounded-md py-1 px-3 text-xs text-green-700 font-medium bg-green-100">
+            Lunas
+          </span>
+        </div>
+        <div v-else>
+          <span class="rounded-md py-1 px-3 text-xs text-red-700 font-medium bg-red-100">
+            Belum Bayar
+          </span>
+        </div>
+      </template>
+      <template #session="{ item }">
+        <div class="mt-2">
+          <div v-if="item.session === 'lunch'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-yellow-100 text-yellow-800">
+            <div class="my-auto mr-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+              </svg>
             </div>
-            <div class="flex">
-              <div class="my-auto mr-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="text-xs">
-                Lunch
-              </div>
+            <div>
+              Lunch
             </div>
           </div>
-          <div class="flex flex-col">
-            <div class="turncate font-bold">
-              {{ item.name }}
+          <div v-else-if="item.session === 'dinner'" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-md bg-blue-100 text-blue-800">
+            <div class="my-auto mr-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
             </div>
-            <div class="text-xs">
-              {{ item.email || 'Tidak memiliki email' }}
-            </div>
-            <div class="text-xs">
-              {{ item.phone || 'Tidak memiliki nomor telepon' }}
+            <div>
+              Dinner
             </div>
           </div>
         </div>
@@ -143,6 +142,7 @@
       :persistent="true"
       :loading="modal.loading"
       class="z-50"
+      :custom-icon="true"
       @click="modalAction"
     >
       <template #title>
@@ -369,6 +369,11 @@
           </div>
         </div>
       </template>
+      <template #icon>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+        </svg>
+      </template>
     </Dialog>
     <Dialog
       v-model="modalQR.state"
@@ -475,13 +480,57 @@ export default {
       ingredients: [],
       perPageViewFilter: perPageView,
       filter: {
-        sort: 'name'
+        sort: 'order_date',
+        filter: [
+          {
+            name: 'is_paid',
+            value: [0]
+          },
+          {
+            name: 'date',
+            value: [moment().format('YYYY-MM-DD')]
+          }
+        ]
       },
+      filters: [
+        {
+          name: 'date',
+          label: 'Range Tanggal',
+          type: 'date.range',
+          def: [moment().format('YYYY-MM-DD')],
+          rules: []
+        },
+        {
+          name: 'is_paid',
+          label: 'Status',
+          def: [0],
+          rules: [
+            {
+              name: 'Lunas',
+              value: 1
+            },
+            {
+              name: 'Belum Bayar',
+              value: 0
+            }
+          ]
+        }
+      ],
       headers: [
         {
-          name: 'Detail Reservasi (Nama)',
+          name: 'Sesi',
+          value: 'session',
+          width: '1/12'
+        },
+        {
+          name: 'Nomor Meja',
+          value: 'table_number',
+          width: '1/12'
+        },
+        {
+          name: 'Nama Pelanggan',
           value: 'name',
-          width: '1/6'
+          width: '1/12'
         },
         {
           name: 'Waktu Masuk',
@@ -506,6 +555,11 @@ export default {
         {
           name: 'Total Item',
           value: 'total_item',
+          width: '1/12'
+        },
+        {
+          name: 'Status',
+          value: 'is_paid',
           width: '1/12'
         },
         {
